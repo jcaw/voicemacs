@@ -30,6 +30,53 @@ direct connection.")
   "The title format before `voicemacs-mode' was enabled.")
 
 
+(defvar voicemacs--data (make-hash-table)
+  "Data that should be mirrored to clients.")
+
+
+(defvar voicemacs--unsynced-keys nil
+  "List of keys that have not yet been synced with the client.
+
+When a key is updated, the client needs to manually grab the new
+value. This list holds these keys.")
+
+
+(defun voicemacs--sync-title ()
+  "Make the title data reflect the internal voicemacs data."
+  ;; TODO: Maybe only do this on an idle timer? Don't want the voice system to
+  ;;   ping Emacs while Emacs is busy.
+  (message "Not implemented."))
+
+
+(defun voicemacs-update-data (key value)
+  "Update data `key' to be `value', and flag it to the user."
+  (puthash key value voicemacs--data)
+  ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
+  ;;   at a lower level?
+  (push key voicemacs--unsynced-keys)
+  (voicemacs--sync-title))
+
+
+(defun voicemacs--hash-subset (hash-table keys)
+  "Get a subset of a hash table with only the keys in `keys'."
+  (let ((result (make-hash-table)))
+    (mapcar (lambda (key)
+               (puthash key (gethash key hash-table) result))
+             keys)
+    result))
+
+
+(defun voicemacs-grab-data ()
+  "Get (and reset) pending changes to the data."
+  ;; TODO: Optimize this so we check whether the data is actually worth
+  ;;   transferring? Compare against a shadow state?
+  (let ((result (voicemacs--hash-subset voicemacs--data
+                                        voicemacs--unsynced-keys)))
+    (setq voicemacs--unsynced-keys '())
+    (voicemacs--sync-title)
+    result))
+
+
 (defun voicemacs--voicemacs-title-p ()
   "Is the title currently in voicemacs format?"
   (let ((default-title (default-value 'frame-title-format)))
