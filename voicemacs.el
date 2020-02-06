@@ -43,9 +43,8 @@ value. This list holds these keys.")
 
 (defun voicemacs--sync-title ()
   "Make the title data reflect the internal voicemacs data."
-  ;; TODO: Maybe only do this on an idle timer? Don't want the voice system to
-  ;;   ping Emacs while Emacs is busy.
-  (message "Not implemented."))
+  (setq voicemacs--title-data
+        (json-encode `(("data" . ,(if voicemacs--unsynced-keys t :json-false))))))
 
 
 (defun voicemacs-update-data (key value)
@@ -91,7 +90,8 @@ value. This list holds these keys.")
   (unless (voicemacs--voicemacs-title-p)
     (setq voicemacs--old-title-format (default-value 'frame-title-format))
     (setq-default frame-title-format (list frame-title-format
-                                           voicemacs--title-suffix))))
+                                           voicemacs--title-suffix))
+    (voicemacs--sync-title)))
 
 
 (defun voicemacs--restore-title ()
