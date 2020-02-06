@@ -1,9 +1,17 @@
 (require 'json)
+(require 'porthole)
 
 
 (defgroup voicemacs nil
   "Utilities to make Emacs easier to control by voice."
   :prefix "voicemacs-")
+
+
+(defconst voicemacs--server-name "voicemacs"
+  "Name of the porthole server for voicemacs.
+
+Clients should use this server for voicemacs-related RPC. Easiest
+way to do that is with the Porthole Python Client.")
 
 
 (defvar voicemacs--title-data ""
@@ -52,12 +60,12 @@ new format."
 (defun voicemacs--mode-disable ()
   (voicemacs--restore-title)
   ;; TODO: Stop syncer
-  ;; TODO: Stop server
+  (porthole-stop-server voicemacs--server-name)
   )
 
 
 (defun voicemacs--mode-enable ()
-  ;; TODO: Start server
+  (porthole-start-server voicemacs--server-name)
   ;; TODO: Start syncer
   (voicemacs--set-title))
 
