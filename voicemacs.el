@@ -21,7 +21,6 @@
   "Minor mode to communicate with voice recognition software."
   :group 'voicemacs
   :global t
-  :init-value t
   :lighter nil
   :after-hook (if voicemacs-mode
                   (voicemacs--mode-enable)
