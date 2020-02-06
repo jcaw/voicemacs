@@ -111,8 +111,7 @@ new format."
 (defun voicemacs--mode-disable ()
   (voicemacs--restore-title)
   ;; TODO: Stop syncer
-  (porthole-stop-server voicemacs--server-name)
-  )
+  (porthole-stop-server voicemacs--server-name))
 
 
 (defun voicemacs--mode-enable ()
