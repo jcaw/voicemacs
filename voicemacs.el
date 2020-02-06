@@ -83,6 +83,7 @@ value. This list holds these keys.")
   "Is the title currently in voicemacs format?"
   (let ((default-title (default-value 'frame-title-format)))
     (and (listp default-title)
+         ;; TODO: Should this have to be the last element?
          (member voicemacs--title-suffix default-title)
          ;; Cast to bool
          t)))
