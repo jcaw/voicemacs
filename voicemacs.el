@@ -139,7 +139,9 @@ new format."
   (remove-hook 'post-command-hook 'voicemacs--sync-major-mode)
   (when voicemacs--major-mode-timer
     (cancel-timer voicemacs--major-mode-timer)
-    (setq voicemacs--major-mode-timer nil)))
+    (setq voicemacs--major-mode-timer nil))
+  ;; Sync current state immediately.
+  (voicemacs--sync-major-mode))
 
 
 (defun voicemacs--sync-setup ()
