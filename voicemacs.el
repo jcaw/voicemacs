@@ -53,7 +53,10 @@ value. This list holds these keys.")
   ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
   ;;   at a lower level?
   (push key voicemacs--unsynced-keys)
-  (voicemacs--sync-title))
+  ;; Emacs won't respond if it's busy with a long-running task. Wait until Emacs
+  ;; can receive messages before we tell the client to ping us. This won't
+  ;; prevent hangs, but it should reduce them.
+  (run-with-idle-timer 0 nil 'voicemacs--sync-title))
 
 
 (defun voicemacs--hash-subset (hash-table keys)
