@@ -68,6 +68,11 @@ value. This list holds these keys.")
     result))
 
 
+(defun voicemacs--get-data (key)
+  "Get the current value of `key' in `voicemacs--data'."
+  (gethash key voicemacs--data))
+
+
 (defun voicemacs-grab-data ()
   "Get (and reset) pending changes to the data."
   ;; TODO: Optimize this so we check whether the data is actually worth
@@ -108,15 +113,52 @@ new format."
   (setq voicemacs--old-title-format nil))
 
 
+(defun voicemacs--sync-major-mode (&rest _)
+  "Sync the current major mode."
+  (let ((major-mode-key 'major-mode))
+    (unless (eq major-mode (voicemacs--get-data major-mode-key))
+      (voicemacs-update-data major-mode-key major-mode))))
+
+
+(defvar voicemacs--major-mode-timer nil
+  "Timer for syncing the major mode.")
+
+
+(defun voicemacs--enable-sync-major-mode ()
+  (add-hook 'after-change-major-mode-hook 'voicemacs--sync-major-mode)
+  ;; This is a reasonable proxy for when we're switching the buffer.
+  (add-hook 'post-command-hook 'voicemacs--sync-major-mode)
+  (unless voicemacs--major-mode-timer
+    ;; Run periodically just in case we miss it.
+    (setq voicemacs--major-mode-timer
+          (run-with-idle-timer 1 0 'voicemacs--sync-major-mode))))
+
+
+(defun voicemacs--disable-sync-major-mode ()
+  (remove-hook 'after-change-major-mode-hook 'voicemacs--sync-major-mode)
+  (remove-hook 'post-command-hook 'voicemacs--sync-major-mode)
+  (when voicemacs--major-mode-timer
+    (cancel-timer voicemacs--major-mode-timer)
+    (setq voicemacs--major-mode-timer nil)))
+
+
+(defun voicemacs--sync-setup ()
+  (voicemacs--enable-sync-major-mode))
+
+
+(defun voicemacs--sync-teardown ()
+  (voicemacs--disable-sync-major-mode))
+
+
 (defun voicemacs--mode-disable ()
   (voicemacs--restore-title)
-  ;; TODO: Stop syncer
+  (voicemacs--sync-setup)
   (porthole-stop-server voicemacs--server-name))
 
 
 (defun voicemacs--mode-enable ()
   (porthole-start-server voicemacs--server-name)
-  ;; TODO: Start syncer
+  (voicemacs--sync-teardown)
   (voicemacs--set-title))
 
 
