@@ -79,6 +79,12 @@ run once."
   (voicemacs--sync-title))
 
 
+(defun voicemacs--update-if-changed (key value)
+  "Update data under `key', iff `value' is different."
+  (unless (voicemacs--equal value (voicemacs--get-data key))
+    (voicemacs-update-data key value)))
+
+
 (defun voicemacs--hash-subset (hash-table keys)
   "Get a subset of a hash table with only the keys in `keys'."
   (let ((result (make-hash-table)))
@@ -135,9 +141,7 @@ new format."
 
 (defun voicemacs--sync-major-mode (&rest _)
   "Sync the current major mode."
-  (let ((major-mode-key 'major-mode))
-    (unless (eq major-mode (voicemacs--get-data major-mode-key))
-      (voicemacs-update-data major-mode-key major-mode))))
+  (voicemacs--update-if-changed 'major-mode major-mode))
 
 
 (defvar voicemacs--major-mode-timer nil
@@ -224,13 +228,10 @@ structure."
 
 New snippets will only be pushed if they've changed. This
 function can be slow, so don't run it regularly."
-  (let ((snippets (voicemacs--get-snippets))
-        (snippets-key 'yasnippets))
-    ;; Compare JSON encodings because we don't know what types to expect -
-    ;; difficult to compare equality. What matters are JSON forms. The question
-    ;; we are asking is, "do we need to send new JSON data to the client?"
-    (unless (voicemacs--equal snippets (voicemacs--get-data snippets-key))
-      (voicemacs-update-data snippets-key snippets))))
+  ;; Compare JSON encodings because we don't know what types to expect -
+  ;; difficult to compare equality. What matters are JSON forms. The question we
+  ;; are asking is, "do we need to send new JSON data to the client?"
+  (voicemacs--update-if-changed 'yasnippets (voicemacs--get-snippets)))
 
 
 (defun voicemacs--sync-snippets-idle ()
