@@ -154,7 +154,9 @@ new format."
   (unless voicemacs--major-mode-timer
     ;; Run periodically just in case we miss it.
     (setq voicemacs--major-mode-timer
-          (run-with-idle-timer 1 0 'voicemacs--sync-major-mode))))
+          (run-with-idle-timer 1 0 'voicemacs--sync-major-mode)))
+  ;; Sync current state immediately.
+  (voicemacs--sync-major-mode))
 
 
 (defun voicemacs--disable-sync-major-mode ()
@@ -162,9 +164,7 @@ new format."
   (remove-hook 'post-command-hook 'voicemacs--sync-major-mode)
   (when voicemacs--major-mode-timer
     (cancel-timer voicemacs--major-mode-timer)
-    (setq voicemacs--major-mode-timer nil))
-  ;; Sync current state immediately.
-  (voicemacs--sync-major-mode))
+    (setq voicemacs--major-mode-timer nil)))
 
 
 (defun voicemacs--snippet (template)
