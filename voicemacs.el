@@ -55,6 +55,15 @@ run once."
   (apply #'run-with-idle-timer (append (list time nil func) args)))
 
 
+(defun voicemacs--equal (item-1 item-2)
+  "Check equality of two objects - tolerates equivalent hash maps."
+  (or (equal item-1 item-2)
+      ;; Check JSON forms so we can tolerate hash maps.
+      ;;
+      ;; TODO: Use a more robust checking system here, JSON isn't great.
+      (string= (json-encode item-1) (json-encode item-2))))
+
+
 (defun voicemacs--sync-title ()
   "Make the title data reflect the internal voicemacs data."
   (setq voicemacs--title-data
@@ -211,6 +220,29 @@ structure."
 (defun voicemacs--active-snippet-tables ()
   "Get a list of the names of the active snippet tables."
   (mapcar 'yas--table-name (yas--get-snippet-tables)))
+
+
+(defun voicemacs--sync-snippets ()
+  "Update voicemacs with all registered snippets.
+
+New snippets will only be pushed if they've changed. This
+function can be slow, so don't run it regularly."
+  (let ((snippets (voicemacs--get-snippets))
+        (snippets-key 'yasnippets))
+    ;; Compare JSON encodings because we don't know what types to expect -
+    ;; difficult to compare equality. What matters are JSON forms. The question
+    ;; we are asking is, "do we need to send new JSON data to the client?"
+    (unless (voicemacs--equal snippets (voicemacs--get-data snippets-key))
+      (voicemacs-update-data snippets-key snippets))))
+
+
+(defun voicemacs--sync-snippets-idle ()
+  "Sync snippets on an idle timer.
+
+Syncing snippets takes a long time so we generally want to do it
+once, after all snippet updates have been applied and Emacs is no
+longer busy. We can use an idle timer for that."
+  (voicemacs--queue-idle-once 0 'voicemacs--sync-snippets))
 
 
 (defun voicemacs--sync-setup ()
