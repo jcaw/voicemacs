@@ -144,6 +144,56 @@ new format."
   (voicemacs--sync-major-mode))
 
 
+(defun voicemacs--snippet (template)
+  "Make a voicemacs-style snippet from a yas `template'.
+
+Returns a hash table with minimal information about the snippet,
+to reduce the amount of data we have to sync."
+  (let ((snippet (make-hash-table)))
+    (puthash "name" (yas--template-name template) snippet)
+    (puthash "key" (yas--template-key template) snippet)
+    ;; TODO: Maybe allow spoken forms in snippets?
+    snippet))
+
+
+(defun voicemacs--snippets-from-table (table)
+  "Get a list of voicemacs-style snippets from a `table'.
+
+The structure (in JSON format) will be:
+
+  [
+    {\"name\": name, \"key\": key},
+    {\"name\": name, \"key\": key},
+    {\"name\": name, \"key\": key},
+  ]
+
+Each dict here represents one snippet."
+  (let ((snippets '()))
+    (maphash (lambda (template-key template)
+               (push (voicemacs--snippet template) snippets))
+             (yas--table-uuidhash table))
+    snippets))
+
+
+(defun voicemacs--get-snippets ()
+  "Get all registered snippets in voicemacs format.
+
+The structure (in JSON format) will be:
+
+  {
+    snippet-list-name: snippet-list,
+    snippet-list-name: snippet-list,
+  }
+
+See `voicemacs--snippets-from-table' for the `snippet-list'
+structure."
+  (let ((snippets (make-hash-table)))
+    (maphash (lambda (key table)
+               (puthash key (voicemacs--snippets-from-table table) snippets))
+             yas--tables)
+    snippets))
+
+
 (defun voicemacs--sync-setup ()
   (voicemacs--enable-sync-major-mode))
 
