@@ -42,6 +42,19 @@ When a key is updated, the client needs to manually grab the new
 value. This list holds these keys.")
 
 
+(defun voicemacs--queue-idle-once (time func &rest args)
+  "Queue a function to run on an idle timer, but only once.
+
+If the function is already queued, it will be replaced (and the
+replacement will use the new timing). Note it will also remove
+the function from ordinary timers.
+
+Useful if you want to delay a slow function that only needs to be
+run once."
+  (cancel-function-timers func)
+  (apply #'run-with-idle-timer (append (list time nil func) args)))
+
+
 (defun voicemacs--sync-title ()
   "Make the title data reflect the internal voicemacs data."
   (setq voicemacs--title-data
