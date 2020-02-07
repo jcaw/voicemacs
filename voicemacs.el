@@ -255,13 +255,13 @@ longer busy. We can use an idle timer for that."
 
 (defun voicemacs--mode-disable ()
   (voicemacs--restore-title)
-  (voicemacs--sync-setup)
+  (voicemacs--sync-teardown)
   (porthole-stop-server voicemacs--server-name))
 
 
 (defun voicemacs--mode-enable ()
   (porthole-start-server voicemacs--server-name)
-  (voicemacs--sync-teardown)
+  (voicemacs--sync-setup)
   (voicemacs--set-title))
 
 
