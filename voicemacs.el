@@ -55,6 +55,14 @@ run once."
   (apply #'run-with-idle-timer (append (list time nil func) args)))
 
 
+(defun voicemacs--queue-once (func &rest args)
+  "Queue a function to run once, during the next pause.
+
+Note this will remove the function from any other timers."
+  (cancel-function-timers func)
+  (apply #'run-with-timer (append (list 0 nil func) args)))
+
+
 (defun voicemacs--equal (item-1 item-2)
   "Check equality of two objects - tolerates equivalent hash maps."
   (or (equal item-1 item-2)
@@ -76,7 +84,7 @@ run once."
   ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
   ;;   at a lower level?
   (push key voicemacs--unsynced-keys)
-  (voicemacs--sync-title))
+  (voicemacs--queue-once 'voicemacs--sync-title))
 
 
 (defun voicemacs--update-if-changed (key value)
