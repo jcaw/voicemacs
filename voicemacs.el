@@ -93,7 +93,7 @@ run once."
   (gethash key voicemacs--data))
 
 
-(defun voicemacs-grab-data ()
+(defun voicemacs-pull-data ()
   "Get (and reset) pending changes to the data."
   ;; TODO: Optimize this so we check whether the data is actually worth
   ;;   transferring? Compare against a shadow state?
