@@ -1,5 +1,6 @@
 (require 'json)
 (require 'porthole)
+(require 'yasnippet)
 
 
 (defgroup voicemacs nil
@@ -192,6 +193,11 @@ structure."
                (puthash key (voicemacs--snippets-from-table table) snippets))
              yas--tables)
     snippets))
+
+
+(defun voicemacs--active-snippet-tables ()
+  "Get a list of the names of the active snippet tables."
+  (mapcar 'yas--table-name (yas--get-snippet-tables)))
 
 
 (defun voicemacs--sync-setup ()
