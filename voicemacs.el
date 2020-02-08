@@ -248,7 +248,7 @@ function can be slow, so don't run it regularly."
   (voicemacs--update-if-changed 'yasnippets (voicemacs--get-snippets)))
 
 
-(defun voicemacs--queue-snippet-sync ()
+(defun voicemacs--queue-snippet-sync (&rest _)
   "Sync snippets on an idle timer.
 
 Syncing snippets takes a long time so we generally want to do it
@@ -257,12 +257,41 @@ longer busy."
   (voicemacs--queue-once 'voicemacs--sync-snippets))
 
 
+(defun voicemacs--enable-sync-snippet-tables ()
+  ;; TODO
+  )
+
+(defun voicemacs--disable-sync-snippet-tables ()
+  ;; TODO
+  )
+
+
+(defun voicemacs--enable-sync-snippets ()
+  (add-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
+  ;; These seem to be the two lowest-level functions that are used to add &
+  ;; remove (and update) snippets.
+  (advice-add 'yas--add-template :after 'voicemacs--queue-snippet-sync)
+  (advice-add 'yas--remove-template-by-uuid :after 'voicemacs--queue-snippet-sync)
+  ;; Sync current state immediately
+  (voicemacs--sync-snippets)
+  (voicemacs--enable-sync-snippet-tables))
+
+
+(defun voicemacs--disable-sync-snippets ()
+  (remove-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
+  (advice-remove 'yas--add-template 'voicemacs--queue-snippet-sync)
+  (advice-remove 'yas--remove-template-by-uuid 'voicemacs--queue-snippet-sync)
+  (voicemacs--disable-sync-snippet-tables))
+
+
 (defun voicemacs--sync-setup ()
-  (voicemacs--enable-sync-major-mode))
+  (voicemacs--enable-sync-major-mode)
+  (voicemacs--enable-sync-snippets))
 
 
 (defun voicemacs--sync-teardown ()
-  (voicemacs--disable-sync-major-mode))
+  (voicemacs--disable-sync-major-mode)
+  (voicemacs--disable-sync-snippets))
 
 
 (defun voicemacs--mode-disable ()
