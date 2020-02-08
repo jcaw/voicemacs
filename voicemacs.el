@@ -248,13 +248,13 @@ function can be slow, so don't run it regularly."
   (voicemacs--update-if-changed 'yasnippets (voicemacs--get-snippets)))
 
 
-(defun voicemacs--sync-snippets-idle ()
+(defun voicemacs--queue-snippet-sync ()
   "Sync snippets on an idle timer.
 
 Syncing snippets takes a long time so we generally want to do it
 once, after all snippet updates have been applied and Emacs is no
-longer busy. We can use an idle timer for that."
-  (voicemacs--queue-idle-once 0 'voicemacs--sync-snippets))
+longer busy."
+  (voicemacs--queue-once 'voicemacs--sync-snippets))
 
 
 (defun voicemacs--sync-setup ()
