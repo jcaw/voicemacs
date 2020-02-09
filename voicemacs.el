@@ -306,7 +306,8 @@ longer busy."
   "Perform necessary setup to enable data synchronization."
   (voicemacs--reset-data)
   (voicemacs--enable-sync-major-mode)
-  (voicemacs--enable-sync-snippets))
+  (voicemacs--enable-sync-snippets)
+  (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
 
 
 (defun voicemacs--sync-teardown ()
