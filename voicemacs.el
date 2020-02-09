@@ -246,8 +246,8 @@ structure."
 
 (defun voicemacs--sync-snippet-tables ()
   "Update voicemacs with the currently active snippet tables."
-  (voicemacs--sync-if-changed 'active-yasnippet-tables
-                              (voicemacs--active-snippet-tables)))
+  (voicemacs--update-if-changed 'active-yasnippet-tables
+                                (voicemacs--active-snippet-tables)))
 
 
 (defun voicemacs--sync-snippets ()
