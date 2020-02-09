@@ -276,6 +276,7 @@ longer busy."
   ;; TODO: Queue this? May not be worth it, not a slow function.
   (voicemacs--hook-change-buffer 'voicemacs--sync-snippet-tables))
 
+
 (defun voicemacs--disable-sync-snippet-tables ()
   "Disable synchronization of the active yasnippet tables."
   (voicemacs--unhook-change-buffer 'voicemacs--sync-snippet-tables))
