@@ -239,15 +239,9 @@ structure."
     snippets))
 
 
-(defun voicemacs--active-snippet-tables ()
-  "Get a list of the names of the active snippet tables."
-  (mapcar 'yas--table-name (yas--get-snippet-tables)))
-
-
 (defun voicemacs--sync-snippet-tables ()
   "Update voicemacs with the currently active snippet tables."
-  (voicemacs--update-if-changed 'active-yasnippet-tables
-                                (voicemacs--active-snippet-tables)))
+  (voicemacs--update-if-changed 'active-yasnippet-tables (yas--modes-to-activate)))
 
 
 (defun voicemacs--sync-snippets ()
