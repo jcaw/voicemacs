@@ -272,14 +272,17 @@ longer busy."
 
 
 (defun voicemacs--enable-sync-snippet-tables ()
+  "Enable synchronization of the active yasnippet tables."
   ;; TODO: Queue this? May not be worth it, not a slow function.
   (voicemacs--hook-change-buffer 'voicemacs--sync-snippet-tables))
 
 (defun voicemacs--disable-sync-snippet-tables ()
+  "Disable synchronization of the active yasnippet tables."
   (voicemacs--unhook-change-buffer 'voicemacs--sync-snippet-tables))
 
 
 (defun voicemacs--enable-sync-snippets ()
+  "Enable synchronization of yasnippets."
   (add-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
   ;; These seem to be the two lowest-level functions that are used to add &
   ;; remove (and update) snippets.
@@ -291,6 +294,7 @@ longer busy."
 
 
 (defun voicemacs--disable-sync-snippets ()
+  "Disable synchronization of yasnippets."
   (remove-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
   (advice-remove 'yas--add-template 'voicemacs--queue-snippet-sync)
   (advice-remove 'yas--remove-template-by-uuid 'voicemacs--queue-snippet-sync)
@@ -298,12 +302,14 @@ longer busy."
 
 
 (defun voicemacs--sync-setup ()
+  "Perform necessary setup to enable data synchronization."
   (voicemacs--reset-data)
   (voicemacs--enable-sync-major-mode)
   (voicemacs--enable-sync-snippets))
 
 
 (defun voicemacs--sync-teardown ()
+  "Tear down data synchronization (reverses `voicemacs--sync-setup')."
   (voicemacs--disable-sync-major-mode)
   (voicemacs--disable-sync-snippets)
   ;; Defensive; probably not necessary
@@ -311,12 +317,14 @@ longer busy."
 
 
 (defun voicemacs--mode-disable ()
+  "Post-enable hook for `voicemacs-mode'."
   (voicemacs--restore-title)
   (voicemacs--sync-teardown)
   (porthole-stop-server voicemacs--server-name))
 
 
 (defun voicemacs--mode-enable ()
+  "Post-disable hook for `voicemacs-mode'."
   (porthole-start-server voicemacs--server-name)
   (voicemacs--sync-setup)
   (voicemacs--set-title))
