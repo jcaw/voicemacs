@@ -118,6 +118,13 @@ Note this will remove the function from any other timers."
     result))
 
 
+(defun voicemacs--reset-data ()
+  "Reset synchronization data to vanilla values."
+  (setq voicemacs--unsynced-keys '())
+  (setq voicemacs--data (make-hash-table))
+  (voicemacs--sync-title))
+
+
 (defun voicemacs--voicemacs-title-p ()
   "Is the title currently in voicemacs format?"
   (let ((default-title (default-value 'frame-title-format)))
@@ -291,13 +298,16 @@ longer busy."
 
 
 (defun voicemacs--sync-setup ()
+  (voicemacs--reset-data)
   (voicemacs--enable-sync-major-mode)
   (voicemacs--enable-sync-snippets))
 
 
 (defun voicemacs--sync-teardown ()
   (voicemacs--disable-sync-major-mode)
-  (voicemacs--disable-sync-snippets))
+  (voicemacs--disable-sync-snippets)
+  ;; Defensive; probably not necessary
+  (voicemacs--reset-data))
 
 
 (defun voicemacs--mode-disable ()
