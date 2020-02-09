@@ -147,6 +147,29 @@ new format."
   (setq voicemacs--old-title-format nil))
 
 
+(defun voicemacs--hook-change-buffer (func)
+  "Hook a function to fire whenever the active buffer changes.
+
+This includes switching windows.
+
+There's no built-in hook for this so the current implementation
+is a heuristic. It has a huge false-positive rate; `func' will
+fire often, even if the buffer hasn't changed. Don't hook slow
+functions."
+  ;; TODO: Observe buffer changes more directly, these are dodgy heuristics.
+  (add-hook 'after-change-major-mode-hook func)
+  ;; This is a reasonable proxy for when we're switching the buffer.
+  (add-hook 'post-command-hook func)
+  (run-with-idle-timer 1 0 func))
+
+
+(defun voicemacs--unhook-change-buffer (func)
+  "Unhook a function that was hooked with `voicemacs--hook-change-buffer'."
+  (remove-hook 'after-change-major-mode-hook func)
+  (remove-hook 'post-command-hook func)
+  (cancel-function-timers func))
+
+
 (defun voicemacs--sync-major-mode (&rest _)
   "Sync the current major mode."
   (voicemacs--update-if-changed 'major-mode major-mode))
@@ -157,23 +180,13 @@ new format."
 
 
 (defun voicemacs--enable-sync-major-mode ()
-  (add-hook 'after-change-major-mode-hook 'voicemacs--sync-major-mode)
-  ;; This is a reasonable proxy for when we're switching the buffer.
-  (add-hook 'post-command-hook 'voicemacs--sync-major-mode)
-  (unless voicemacs--major-mode-timer
-    ;; Run periodically just in case we miss it.
-    (setq voicemacs--major-mode-timer
-          (run-with-idle-timer 1 0 'voicemacs--sync-major-mode)))
+  (voicemacs--hook-change-buffer 'voicemacs--sync-major-mode)
   ;; Sync current state immediately.
   (voicemacs--sync-major-mode))
 
 
 (defun voicemacs--disable-sync-major-mode ()
-  (remove-hook 'after-change-major-mode-hook 'voicemacs--sync-major-mode)
-  (remove-hook 'post-command-hook 'voicemacs--sync-major-mode)
-  (when voicemacs--major-mode-timer
-    (cancel-timer voicemacs--major-mode-timer)
-    (setq voicemacs--major-mode-timer nil)))
+  (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
 
 
 (defun voicemacs--snippet (template)
