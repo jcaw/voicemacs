@@ -455,6 +455,8 @@ disabled."
                      'voicemacs--disable-sync-major-mode)
 (voicemacs--sync-add 'voicemacs--enable-sync-commands
                      'voicemacs--disable-sync-commands)
+(voicemacs--sync-add 'voicemacs--enable-sync-minor-modes
+                     'voicemacs--disable-sync-minor-modes)
 (with-eval-after-load 'yasnippet
   (voicemacs--sync-add 'voicemacs--enable-sync-snippets
                        'voicemacs--disable-sync-snippets))
