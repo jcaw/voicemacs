@@ -206,6 +206,16 @@ functions."
               (mapcar #'car minor-mode-alist)))
 
 
+(defun voicemacs--sync-minor-modes (&rest _)
+  "Synchronize the active minor modes."
+  (voicemacs--update-if-changed 'minor-modes (voicemacs--active-minor-modes)))
+
+
+(defun voicemacs--queue-sync-minor-modes (&rest _)
+  "Queue synchronization of active minor modes."
+  (voicemacs--queue-once 'voicemacs--sync-minor-modes))
+
+
 (defun voicemacs--defined-commands ()
   "Get a list of all defined commands."
   ;; TODO: is there a dedicated variable for commands? Don't want to compute
