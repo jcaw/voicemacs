@@ -24,7 +24,15 @@ direct connection.")
 
 
 (defconst voicemacs--title-suffix
-  '(:eval (concat " ; " voicemacs--title-data))
+  '(:eval (concat
+           ;; Delineate voicemacs data with a semicolon.
+           "; "
+           ;; This prefix doubles as an indicator that voicemacs is active.
+           "voicemacs-data: "
+           voicemacs--title-data
+           ;; Tail with this to defend against something being added to the end
+           ;; of the title.
+           ";"))
   "The title format used by voicemacs.")
 
 
