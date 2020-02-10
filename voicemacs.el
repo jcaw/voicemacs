@@ -156,6 +156,74 @@ new format."
     (setq voicemacs--old-title-format nil)))
 
 
+(defvar voicemacs--sync-setup-hook '()
+  "Hook run when voicemacs enables synchronization.
+
+Don't hook functions to this hook directly - use
+`voicemacs--add-sync'.")
+
+
+(defvar voicemacs--sync-teardown-hook '()
+  "Hook run when voicemacs disables synchronization.
+
+Don't hook functions to this hook directly - use
+`voicemacs--add-sync'.")
+
+
+;; TODO: Improve documentation
+(defun voicemacs--sync-add (setup teardown)
+  "Add a new data synchronizer to `voicemacs-mode'.
+
+`setup' is the function to run when synchronization is enabled.
+`teardown' is the function to run when synchornization is
+disabled."
+  ;; Guard to stop double-enable
+  (unless (member setup voicemacs--sync-setup-hook)
+    (add-hook 'voicemacs--sync-setup-hook setup)
+    (when voicemacs-mode
+      ;; Hook won't run if `voicemacs-mode' is already active.
+      (apply setup)))
+  (add-hook 'voicemacs--sync-teardown-hook teardown))
+
+
+(defun voicemacs--sync-setup ()
+  "Perform necessary setup to enable data synchronization."
+  (voicemacs--reset-data)
+  (run-hooks 'voicemacs--sync-setup-hook)
+  (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
+
+
+(defun voicemacs--sync-teardown ()
+  "Tear down data synchronization (reverses `voicemacs--sync-setup')."
+  (run-hooks 'voicemacs--sync-teardown-hook)
+  ;; Defensive; probably not necessary
+  (voicemacs--reset-data))
+
+
+(defun voicemacs--mode-disable ()
+  "Post-enable hook for `voicemacs-mode'."
+  (voicemacs--restore-title)
+  (voicemacs--sync-teardown)
+  (porthole-stop-server voicemacs--server-name))
+
+
+(defun voicemacs--mode-enable ()
+  "Post-disable hook for `voicemacs-mode'."
+  (porthole-start-server voicemacs--server-name)
+  (voicemacs--sync-setup)
+  (voicemacs--set-title))
+
+
+(define-minor-mode voicemacs-mode
+  "Minor mode to communicate with voice recognition software."
+  :group 'voicemacs
+  :global t
+  :lighter nil
+  :after-hook (if voicemacs-mode
+                  (voicemacs--mode-enable)
+                (voicemacs--mode-disable)))
+
+
 (defun voicemacs--hook-change-buffer (func)
   "Hook a function to fire whenever the active buffer changes.
 
@@ -383,74 +451,6 @@ longer busy."
   (advice-remove 'yas--add-template 'voicemacs--queue-snippet-sync)
   (advice-remove 'yas--remove-template-by-uuid 'voicemacs--queue-snippet-sync)
   (voicemacs--disable-sync-snippet-tables))
-
-
-(defvar voicemacs--sync-setup-hook '()
-  "Hook run when voicemacs enables synchronization.
-
-Don't hook functions to this hook directly - use
-`voicemacs--add-sync'.")
-
-
-(defvar voicemacs--sync-teardown-hook '()
-  "Hook run when voicemacs disables synchronization.
-
-Don't hook functions to this hook directly - use
-`voicemacs--add-sync'.")
-
-
-;; TODO: Improve documentation
-(defun voicemacs--sync-add (setup teardown)
-  "Add a new data synchronizer to `voicemacs-mode'.
-
-`setup' is the function to run when synchronization is enabled.
-`teardown' is the function to run when synchornization is
-disabled."
-  ;; Guard to stop double-enable
-  (unless (member setup voicemacs--sync-setup-hook)
-    (add-hook 'voicemacs--sync-setup-hook setup)
-    (when voicemacs-mode
-      ;; Hook won't run if `voicemacs-mode' is already active.
-      (apply setup)))
-  (add-hook 'voicemacs--sync-teardown-hook teardown))
-
-
-(defun voicemacs--sync-setup ()
-  "Perform necessary setup to enable data synchronization."
-  (voicemacs--reset-data)
-  (run-hooks 'voicemacs--sync-setup-hook)
-  (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
-
-
-(defun voicemacs--sync-teardown ()
-  "Tear down data synchronization (reverses `voicemacs--sync-setup')."
-  (run-hooks 'voicemacs--sync-teardown-hook)
-  ;; Defensive; probably not necessary
-  (voicemacs--reset-data))
-
-
-(defun voicemacs--mode-disable ()
-  "Post-enable hook for `voicemacs-mode'."
-  (voicemacs--restore-title)
-  (voicemacs--sync-teardown)
-  (porthole-stop-server voicemacs--server-name))
-
-
-(defun voicemacs--mode-enable ()
-  "Post-disable hook for `voicemacs-mode'."
-  (porthole-start-server voicemacs--server-name)
-  (voicemacs--sync-setup)
-  (voicemacs--set-title))
-
-
-(define-minor-mode voicemacs-mode
-  "Minor mode to communicate with voice recognition software."
-  :group 'voicemacs
-  :global t
-  :lighter nil
-  :after-hook (if voicemacs-mode
-                  (voicemacs--mode-enable)
-                (voicemacs--mode-disable)))
 
 
 (voicemacs--sync-add 'voicemacs--enable-sync-major-mode
