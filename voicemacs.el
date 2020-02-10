@@ -216,6 +216,17 @@ functions."
   (voicemacs--queue-once 'voicemacs--sync-minor-modes))
 
 
+(defun voicemacs--enable-sync-minor-modes ()
+  "Enable synchornization of the active minor modes."
+  ;; TODO: Also want to sync change minor modes?
+  (voicemacs--hook-change-buffer 'voicemacs--queue-sync-minor-modes))
+
+
+(defun voicemacs--disable-sync-minor-modes ()
+  "Disable synchornization of the active minor modes."
+  (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-minor-modes))
+
+
 (defun voicemacs--defined-commands ()
   "Get a list of all defined commands."
   ;; TODO: is there a dedicated variable for commands? Don't want to compute
