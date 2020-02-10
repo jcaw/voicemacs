@@ -294,6 +294,10 @@ functions."
   (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
 
 
+(voicemacs--sync-add 'voicemacs--enable-sync-major-mode
+                     'voicemacs--disable-sync-major-mode)
+
+
 ;; Minor Modes Sync
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -325,6 +329,10 @@ functions."
 (defun voicemacs--disable-sync-minor-modes ()
   "Disable synchornization of the active minor modes."
   (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-minor-modes))
+
+
+(voicemacs--sync-add 'voicemacs--enable-sync-minor-modes
+                     'voicemacs--disable-sync-minor-modes)
 
 
 ;; Defined Commands Sync
@@ -381,6 +389,10 @@ We can use this to temporarily disable it, reducing overhead."
   (advice-remove 'defun 'voicemacs--queue-sync-commands)
   (advice-remove 'require 'voicemacs--remove-command-sync-advice)
   (advice-remove 'load 'voicemacs--remove-command-sync-advice))
+
+
+(voicemacs--sync-add 'voicemacs--enable-sync-commands
+                     'voicemacs--disable-sync-commands)
 
 
 ;; Yasnippets Sync
@@ -493,18 +505,12 @@ longer busy."
   (voicemacs--disable-sync-snippet-tables))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(voicemacs--sync-add 'voicemacs--enable-sync-major-mode
-                     'voicemacs--disable-sync-major-mode)
-(voicemacs--sync-add 'voicemacs--enable-sync-commands
-                     'voicemacs--disable-sync-commands)
-(voicemacs--sync-add 'voicemacs--enable-sync-minor-modes
-                     'voicemacs--disable-sync-minor-modes)
 (with-eval-after-load 'yasnippet
   (voicemacs--sync-add 'voicemacs--enable-sync-snippets
                        'voicemacs--disable-sync-snippets))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (provide 'voicemacs)
