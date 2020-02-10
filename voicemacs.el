@@ -150,8 +150,9 @@ Note this will remove the function from any other timers."
 Note this will only revert a voicemacs-formatted title. If thet
 title format has been modified since, this method will leave the
 new format."
-  (setq-default frame-title-format voicemacs--old-title-format)
-  (setq voicemacs--old-title-format nil))
+  (when voicemacs--old-title-format
+    (setq-default frame-title-format voicemacs--old-title-format)
+    (setq voicemacs--old-title-format nil)))
 
 
 (defun voicemacs--hook-change-buffer (func)
