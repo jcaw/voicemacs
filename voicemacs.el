@@ -424,10 +424,11 @@ disabled."
 
 (voicemacs--sync-add 'voicemacs--enable-sync-major-mode
                      'voicemacs--disable-sync-major-mode)
-(voicemacs--sync-add 'voicemacs--enable-sync-snippets
-                     'voicemacs--disable-sync-snippets)
 (voicemacs--sync-add 'voicemacs--enable-sync-commands
                      'voicemacs--disable-sync-commands)
+(with-eval-after-load 'yasnippet
+  (voicemacs--sync-add 'voicemacs--enable-sync-snippets
+                       'voicemacs--disable-sync-snippets))
 
 
 (provide 'voicemacs)
