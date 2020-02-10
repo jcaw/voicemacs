@@ -1,6 +1,7 @@
 (require 'json)
 (require 'porthole)
 (require 'yasnippet)
+(require 'seq)
 
 
 (defgroup voicemacs nil
@@ -195,6 +196,13 @@ functions."
 
 (defun voicemacs--disable-sync-major-mode ()
   (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
+
+
+(defun voicemacs--defined-commands ()
+  "Get a list of all defined commands."
+  ;; TODO: is there a dedicated variable for commands? Don't want to compute
+  ;;   unless we have to.
+  (seq-filter 'commandp obarray))
 
 
 (defun voicemacs--snippet (template)
