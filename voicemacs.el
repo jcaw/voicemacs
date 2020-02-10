@@ -28,7 +28,7 @@ direct connection.")
            ;; Delineate voicemacs data with a semicolon.
            "; "
            ;; This prefix doubles as an indicator that voicemacs is active.
-           "voicemacs-data: "
+           "voicemacs: "
            voicemacs--title-data
            ;; Tail with this to defend against something being added to the end
            ;; of the title.
