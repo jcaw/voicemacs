@@ -218,6 +218,41 @@ functions."
   (voicemacs--queue-idle-once 1 'voicemacs--sync-commands))
 
 
+(defun voicemacs--temp-disable-command-sync (original-func &rest args)
+  "Temporarily stop syncing commands after every `defun'.
+
+When loading many function definitions, we don't want to be
+pushing the command sync onto a timer after every single `defun'.
+We can use this to temporarily disable it, reducing overhead."
+  ;; Ignore errors so we never affect/interrupt the underlying command - it
+  ;; could be important, like `require' or `load'.
+  (message "wrapped temp disable")
+  (ignore-errors
+    (advice-remove 'defun 'voicemacs--queue-sync-commands))
+  (let ((result (apply original-func args)))
+    (ignore-errors
+      (advice-add 'defun :after 'voicemacs--queue-sync-commands)
+      ;; Since we suppressed it, we should manually queue once.
+      (voicemacs--queue-sync-commands))
+    result))
+
+
+(defun voicemacs--enable-sync-commands ()
+  (advice-add 'defun :after 'voicemacs--queue-sync-commands)
+  ;; When we load a file, there's lots of function definitions. Don't need to
+  ;; sync after every one.
+  (advice-add 'require :around 'voicemacs--temp-disable-command-sync)
+  (advice-add 'load :around 'voicemacs--temp-disable-command-sync)
+  ;; Sync current state immediately.
+  (voicemacs--queue-sync-commands))
+
+
+(defun voicemacs--disable-sync-commands ()
+  (advice-remove 'defun 'voicemacs--queue-sync-commands)
+  (advice-remove 'require 'voicemacs--remove-command-sync-advice)
+  (advice-remove 'load 'voicemacs--remove-command-sync-advice))
+
+
 (defun voicemacs--snippet (template)
   "Make a voicemacs-style snippet from a yas `template'.
 
