@@ -364,6 +364,7 @@ longer busy."
   (voicemacs--reset-data)
   (voicemacs--enable-sync-major-mode)
   (voicemacs--enable-sync-snippets)
+  (voicemacs--enable-sync-commands)
   (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
 
 
@@ -371,6 +372,7 @@ longer busy."
   "Tear down data synchronization (reverses `voicemacs--sync-setup')."
   (voicemacs--disable-sync-major-mode)
   (voicemacs--disable-sync-snippets)
+  (voicemacs--disable-sync-commands)
   ;; Defensive; probably not necessary
   (voicemacs--reset-data))
 
