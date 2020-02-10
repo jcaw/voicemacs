@@ -198,6 +198,14 @@ functions."
   (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
 
 
+(defun voicemacs--active-minor-modes ()
+  "Get the currently active minor modes."
+  (seq-filter (lambda (symbol)
+                (and (boundp symbol)
+                     (symbol-value symbol)))
+              (mapcar #'car minor-mode-alist)))
+
+
 (defun voicemacs--defined-commands ()
   "Get a list of all defined commands."
   ;; TODO: is there a dedicated variable for commands? Don't want to compute
