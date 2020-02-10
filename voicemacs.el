@@ -247,6 +247,10 @@ functions."
   (cancel-function-timers func))
 
 
+;; Major Mode Sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (defun voicemacs--sync-major-mode (&rest _)
   "Sync the current major mode."
   (voicemacs--update-if-changed 'major-mode major-mode))
@@ -264,6 +268,10 @@ functions."
 
 (defun voicemacs--disable-sync-major-mode ()
   (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
+
+
+;; Minor Modes Sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs--active-minor-modes ()
@@ -293,6 +301,10 @@ functions."
 (defun voicemacs--disable-sync-minor-modes ()
   "Disable synchornization of the active minor modes."
   (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-minor-modes))
+
+
+;; Defined Commands Sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs--defined-commands ()
@@ -345,6 +357,10 @@ We can use this to temporarily disable it, reducing overhead."
   (advice-remove 'defun 'voicemacs--queue-sync-commands)
   (advice-remove 'require 'voicemacs--remove-command-sync-advice)
   (advice-remove 'load 'voicemacs--remove-command-sync-advice))
+
+
+;; Yasnippets Sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs--snippet (template)
@@ -451,6 +467,9 @@ longer busy."
   (advice-remove 'yas--add-template 'voicemacs--queue-snippet-sync)
   (advice-remove 'yas--remove-template-by-uuid 'voicemacs--queue-snippet-sync)
   (voicemacs--disable-sync-snippet-tables))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (voicemacs--sync-add 'voicemacs--enable-sync-major-mode
