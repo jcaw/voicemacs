@@ -205,6 +205,19 @@ functions."
   (seq-filter 'commandp obarray))
 
 
+(defun voicemacs--sync-commands ()
+  "Sync defined commands, iff they've changed."
+  (message "syncing commands")
+  (voicemacs--update-if-changed 'defined-commands (voicemacs--defined-commands)))
+
+
+(defun voicemacs--queue-sync-commands (&rest _)
+  ;; We don't need this to fire off quickly. Idle timer may reduce overhead a
+  ;; little.
+  (message "queuing command sync")
+  (voicemacs--queue-idle-once 1 'voicemacs--sync-commands))
+
+
 (defun voicemacs--snippet (template)
   "Make a voicemacs-style snippet from a yas `template'.
 
