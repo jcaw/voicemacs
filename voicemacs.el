@@ -356,20 +356,44 @@ longer busy."
   (voicemacs--disable-sync-snippet-tables))
 
 
+(defvar voicemacs--sync-setup-hook '()
+  "Hook run when voicemacs enables synchronization.
+
+Don't hook functions to this hook directly - use
+`voicemacs--add-sync'.")
+
+
+(defvar voicemacs--sync-teardown-hook '()
+  "Hook run when voicemacs disables synchronization.
+
+Don't hook functions to this hook directly - use
+`voicemacs--add-sync'.")
+
+
+;; TODO: Improve documentation
+(defun voicemacs--sync-add (setup teardown)
+  "Add a new data synchronizer to `voicemacs-mode'.
+
+`setup' is the function to run when synchronization is enabled.
+`teardown' is the function to run when synchornization is
+disabled."
+  (add-hook 'voicemacs--sync-setup-hook setup)
+  (add-hook 'voicemacs--sync-teardown-hook teardown)
+  (when voicemacs-mode
+    ;; Hook won't run if `voicemacs-mode' is already active.
+    (setup)))
+
+
 (defun voicemacs--sync-setup ()
   "Perform necessary setup to enable data synchronization."
   (voicemacs--reset-data)
-  (voicemacs--enable-sync-major-mode)
-  (voicemacs--enable-sync-snippets)
-  (voicemacs--enable-sync-commands)
+  (run-hooks 'voicemacs--sync-setup-hook)
   (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
 
 
 (defun voicemacs--sync-teardown ()
   "Tear down data synchronization (reverses `voicemacs--sync-setup')."
-  (voicemacs--disable-sync-major-mode)
-  (voicemacs--disable-sync-snippets)
-  (voicemacs--disable-sync-commands)
+  (run-hooks 'voicemacs--sync-teardown-hook)
   ;; Defensive; probably not necessary
   (voicemacs--reset-data))
 
@@ -396,6 +420,14 @@ longer busy."
   :after-hook (if voicemacs-mode
                   (voicemacs--mode-enable)
                 (voicemacs--mode-disable)))
+
+
+(voicemacs--sync-add 'voicemacs--enable-sync-major-mode
+                     'voicemacs--disable-sync-major-mode)
+(voicemacs--sync-add 'voicemacs--enable-sync-snippets
+                     'voicemacs--disable-sync-snippets)
+(voicemacs--sync-add 'voicemacs--enable-sync-commands
+                     'voicemacs--disable-sync-commands)
 
 
 (provide 'voicemacs)
