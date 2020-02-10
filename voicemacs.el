@@ -207,14 +207,12 @@ functions."
 
 (defun voicemacs--sync-commands ()
   "Sync defined commands, iff they've changed."
-  (message "syncing commands")
   (voicemacs--update-if-changed 'defined-commands (voicemacs--defined-commands)))
 
 
 (defun voicemacs--queue-sync-commands (&rest _)
   ;; We don't need this to fire off quickly. Idle timer may reduce overhead a
   ;; little.
-  (message "queuing command sync")
   (voicemacs--queue-idle-once 1 'voicemacs--sync-commands))
 
 
@@ -226,7 +224,6 @@ pushing the command sync onto a timer after every single `defun'.
 We can use this to temporarily disable it, reducing overhead."
   ;; Ignore errors so we never affect/interrupt the underlying command - it
   ;; could be important, like `require' or `load'.
-  (message "wrapped temp disable")
   (ignore-errors
     (advice-remove 'defun 'voicemacs--queue-sync-commands))
   (let ((result (apply original-func args)))
