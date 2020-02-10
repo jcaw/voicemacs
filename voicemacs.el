@@ -81,10 +81,26 @@ Note this will remove the function from any other timers."
       (string= (json-encode item-1) (json-encode item-2))))
 
 
+(defun voicemacs--assert-no-semicolons (string)
+  "Raise an error if `string' contains semicolons. Returns `string'."
+  (mapcar (lambda (char)
+            (when (= char ?\;)
+              (error "String contains semicolon(s): \"%s\"" string)))
+          string)
+  string)
+
+
 (defun voicemacs--sync-title ()
   "Make the title data reflect the internal voicemacs data."
   (setq voicemacs--title-data
-        (json-encode `(("data" . ,(if voicemacs--unsynced-keys t :json-false))))))
+        ;; Semicolons are used to separate the data section in the title - we
+        ;; can't include them in the title's data.
+        ;;
+        ;; The point of raising an error here is to make the limitation very
+        ;; overt. This error should never be raised in production, since it will
+        ;; cause the entire sync mechanism to grind to a halt.
+        (voicemacs--assert-no-semicolons
+         (json-encode `(("data" . ,(if voicemacs--unsynced-keys t :json-false)))))))
 
 
 (defun voicemacs-update-data (key value)
