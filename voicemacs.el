@@ -406,11 +406,13 @@ Don't hook functions to this hook directly - use
 `setup' is the function to run when synchronization is enabled.
 `teardown' is the function to run when synchornization is
 disabled."
-  (add-hook 'voicemacs--sync-setup-hook setup)
-  (add-hook 'voicemacs--sync-teardown-hook teardown)
-  (when voicemacs-mode
-    ;; Hook won't run if `voicemacs-mode' is already active.
-    (setup)))
+  ;; Guard to stop double-enable
+  (unless (member setup voicemacs--sync-setup-hook)
+    (add-hook 'voicemacs--sync-setup-hook setup)
+    (when voicemacs-mode
+      ;; Hook won't run if `voicemacs-mode' is already active.
+      (apply setup)))
+  (add-hook 'voicemacs--sync-teardown-hook teardown))
 
 
 (defun voicemacs--sync-setup ()
