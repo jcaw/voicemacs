@@ -88,6 +88,7 @@
   (voicemacs--mapatoms 'commandp))
 
 
+;; TODO: Repeating concepts here. Turn this into a macro.
 (defun voicemacs--sync-commands ()
   "Sync defined commands, iff they've changed."
   (voicemacs--update-if-changed 'defined-commands (voicemacs--defined-commands)))
