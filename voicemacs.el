@@ -310,6 +310,9 @@ This function uses a similar method to that used by Flyspell."
                      'voicemacs--disable-sync-in-comment)
 
 
+;; TODO: Maybe also in-string-p?
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
