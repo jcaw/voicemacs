@@ -287,6 +287,8 @@ This function uses a similar method to that used by Flyspell."
    )
 
 
+;; TODO: Forces regular syncs when we move cursor through a comment. That's
+;;   slow, creates choppiness. Put this info in the title?
 (defun voicemacs--sync-in-comment (&rest _)
   "Sync whether the cursor is in a comment."
   (voicemacs--update-if-changed
