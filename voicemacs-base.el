@@ -14,6 +14,10 @@ Clients should use this server for voicemacs-related RPC. Easiest
 way to do that is with the Porthole Python Client.")
 
 
+(defvar voicemacs--exposed-functions '()
+  "Functions that should be exposed by voicemacs.")
+
+
 (defvar voicemacs--title-data ""
   "JSON-formatted string containing data that is appended to the title.
 
@@ -47,6 +51,17 @@ direct connection.")
 
 When a key is updated, the client needs to manually grab the new
 value. This list holds these keys.")
+
+
+(defun voicemacs-expose-function (func)
+  "Expose `func' over the RPC server when in `voicemacs-mode'."
+  (unless (member func voicemacs--exposed-functions)
+    (push func voicemacs--exposed-functions)
+    (when (and voicemacs-mode (porthole-server-running-p voicemacs--server-name))
+      (porthole-expose-function voicemacs--server-name func))))
+
+
+;; TODO: `voicemacs-remove-function'
 
 
 (cl-defun voicemacs--queue-once (func &key (args '()) (time 0))
@@ -134,6 +149,9 @@ If `full' is t, gets all data, not just the changes."
     result))
 
 
+(voicemacs-expose-function 'voicemacs-pull-data)
+
+
 (defun voicemacs--reset-data ()
   "Reset synchronization data to vanilla values."
   (setq voicemacs--unsynced-keys '())
@@ -204,8 +222,7 @@ disabled."
 (defun voicemacs--sync-setup ()
   "Perform necessary setup to enable data synchronization."
   (voicemacs--reset-data)
-  (run-hooks 'voicemacs--sync-setup-hook)
-  (porthole-expose-function voicemacs--server-name 'voicemacs-pull-data))
+  (run-hooks 'voicemacs--sync-setup-hook))
 
 
 (defun voicemacs--sync-teardown ()
@@ -225,6 +242,7 @@ disabled."
 (defun voicemacs--mode-enable ()
   "Post-disable hook for `voicemacs-mode'."
   (porthole-start-server voicemacs--server-name)
+  (porthole-expose-functions voicemacs--server-name voicemacs--exposed-functions)
   (voicemacs--sync-setup)
   (voicemacs--set-title))
 
