@@ -259,6 +259,34 @@ longer busy."
                        'voicemacs--disable-sync-snippets))
 
 
+;; Cursor in a Comment?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun voicemacs--in-comment-p (&optional pos)
+  "Check if the cursor is in a comment by examining font faces.
+
+Uses current point by default. Provide `POS' to specify a
+different position.
+
+This function uses a similar method to that used by Flyspell."
+  ;; `pos' defaults to point
+  (unless (integerp pos)
+    (setq pos (point)))
+  ;; Check the face directly. Is it a comment face?
+  (let* ((raw-faces (get-text-property pos 'face))
+         ;; The 'face property could be a list, could be a single item.
+         ;; Normalize it to a list.
+         (faces-list (if (listp raw-faces)
+                         raw-faces
+                       (list raw-faces))))
+    (or (member 'font-lock-comment-face faces-list)
+            (member 'font-lock-comment-delimiter-face faces-list)))
+   ;; TODO: Fall back to the standard method if not?
+   ;; (nth 4 (syntax-ppss))
+   )
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
