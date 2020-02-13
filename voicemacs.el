@@ -31,7 +31,7 @@ direct connection.")
            voicemacs--title-data
            ;; Tail with this to defend against something being added to the end
            ;; of the title.
-           ";"))
+           "; "))
   "The title format used by voicemacs.")
 
 
