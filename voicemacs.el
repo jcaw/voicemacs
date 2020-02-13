@@ -13,10 +13,6 @@
   (voicemacs--update-if-changed 'major-mode major-mode))
 
 
-(defvar voicemacs--major-mode-timer nil
-  "Timer for syncing the major mode.")
-
-
 (defun voicemacs--enable-sync-major-mode ()
   (voicemacs--hook-change-buffer 'voicemacs--sync-major-mode)
   ;; Sync current state immediately.
