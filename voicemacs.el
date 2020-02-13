@@ -349,8 +349,9 @@ functions."
 
 
 (defun voicemacs--queue-sync-commands (&rest _)
-  ;; We don't need this to fire off quickly. Idle timer may reduce overhead a
-  ;; little.
+  ;; Command definitions will be relatively rare after startup - we don't need
+  ;; to update the list quickly. Delay more than normal to reduce visible
+  ;; overhead.
   (voicemacs--queue-once 'voicemacs--sync-commands
                          :time 1))
 
