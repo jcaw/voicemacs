@@ -287,6 +287,27 @@ This function uses a similar method to that used by Flyspell."
    )
 
 
+(defun voicemacs--sync-in-comment (&rest _)
+  "Sync whether the cursor is in a comment."
+  (voicemacs--update-if-changed
+   'in-comment
+   ;; Sending over the wire, so we need True or False, not truthiness
+   (if (voicemacs-in-comment-p) t :json-false)))
+
+
+(defun voicemacs--enable-sync-in-comment ()
+  ;; Quickly sync whenever idle.
+  (run-with-idle-timer 0 0 'voicemacs--sync-in-comment))
+
+
+(defun voicemacs--disable-sync-in-comment ()
+  (cancel-function-timers 'voicemacs--sync-in-comment))
+
+
+(voicemacs--sync-add 'voicemacs--enable-sync-in-comment
+                     'voicemacs--disable-sync-in-comment)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
