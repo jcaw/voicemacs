@@ -50,25 +50,14 @@ When a key is updated, the client needs to manually grab the new
 value. This list holds these keys.")
 
 
-(defun voicemacs--queue-idle-once (time func &rest args)
-  "Queue a function to run on an idle timer, but only once.
+(cl-defun voicemacs--queue-once (func &key (args '()) (time 0))
+  "Queue a function to run once, when Emacs is next idle.
 
 If the function is already queued, it will be replaced (and the
 replacement will use the new timing). Note it will also remove
-the function from ordinary timers.
-
-Useful if you want to delay a slow function that only needs to be
-run once."
+the function from ordinary timers."
   (cancel-function-timers func)
   (apply #'run-with-idle-timer (append (list time nil func) args)))
-
-
-(defun voicemacs--queue-once (func &rest args)
-  "Queue a function to run once, during the next pause.
-
-Note this will remove the function from any other timers."
-  (cancel-function-timers func)
-  (apply #'run-with-timer (append (list 0 nil func) args)))
 
 
 (defun voicemacs--equal (item-1 item-2)
@@ -362,7 +351,8 @@ functions."
 (defun voicemacs--queue-sync-commands (&rest _)
   ;; We don't need this to fire off quickly. Idle timer may reduce overhead a
   ;; little.
-  (voicemacs--queue-idle-once 1 'voicemacs--sync-commands))
+  (voicemacs--queue-once 'voicemacs--sync-commands
+                         :time 1))
 
 
 (defun voicemacs--temp-disable-command-sync (original-func &rest args)
