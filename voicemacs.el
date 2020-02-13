@@ -453,6 +453,11 @@ structure."
   (voicemacs--update-if-changed 'active-yasnippet-tables (yas--modes-to-activate)))
 
 
+(defun voicemacs--queue-sync-snippet-tables ()
+  "Queue an update to the currently active snippet tables."
+  (voicemacs--queue-once 'voicemacs--sync-snippet-tables))
+
+
 (defun voicemacs--sync-snippets ()
   "Update voicemacs with all registered snippets.
 
@@ -476,12 +481,12 @@ longer busy."
 (defun voicemacs--enable-sync-snippet-tables ()
   "Enable synchronization of the active yasnippet tables."
   ;; TODO: Queue this? May not be worth it, not a slow function.
-  (voicemacs--hook-change-buffer 'voicemacs--sync-snippet-tables))
+  (voicemacs--hook-change-buffer 'voicemacs--queue-sync-snippet-tables))
 
 
 (defun voicemacs--disable-sync-snippet-tables ()
   "Disable synchronization of the active yasnippet tables."
-  (voicemacs--unhook-change-buffer 'voicemacs--sync-snippet-tables))
+  (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-snippet-tables))
 
 
 (defun voicemacs--enable-sync-snippets ()
