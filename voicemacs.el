@@ -120,12 +120,16 @@ the function from ordinary timers."
   (gethash key voicemacs--data))
 
 
-(defun voicemacs-pull-data ()
-  "Get (and reset) pending changes to the data."
+(defun voicemacs-pull-data (&optional full)
+  "Get (and reset) pending changes to the data.
+
+If `full' is t, gets all data, not just the changes."
   ;; TODO: Optimize this so we check whether the data is actually worth
   ;;   transferring? Compare against a shadow state?
-  (let ((result (voicemacs--hash-subset voicemacs--data
-                                        voicemacs--unsynced-keys)))
+  (let ((result (if full
+                    voicemacs--data
+                  (voicemacs--hash-subset voicemacs--data
+                                          voicemacs--unsynced-keys))))
     (setq voicemacs--unsynced-keys '())
     (voicemacs--sync-title)
     result))
