@@ -1,6 +1,7 @@
 (require 'yasnippet)
 
 (require 'voicemacs-base)
+(require 'voicemacs-command)
 
 
 ;; Major Mode Sync
