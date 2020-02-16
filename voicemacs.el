@@ -258,7 +258,7 @@ longer busy."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun voicemacs--in-comment-p (&optional pos)
+(defun voicemacs-in-comment-p (&optional pos)
   "Check if the cursor is in a comment by examining font faces.
 
 Uses current point by default. Provide `POS' to specify a
