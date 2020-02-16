@@ -16,7 +16,9 @@ This function uses emulation techniques to make the command
 behave as much like a keyboard command as possible, down to
 injection into the event loop. Using this method, the command can
 be smoothly included in Macros, executed after existing commands
-in the queue, and more.
+in the queue, etc. This also causes errors to be reported in a
+similar manner to normal commands (rather than in the network
+process filter).
 
 It is important that RPC-based voice commands are
 indistinguishable (from the user's perspective) from commands
