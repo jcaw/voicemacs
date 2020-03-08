@@ -1,3 +1,5 @@
+(require 'default-text-scale)
+
 (require 'voicemacs-base)
 (require 'voicemacs-command)
 
@@ -306,6 +308,22 @@ This function uses a similar method to that used by Flyspell."
 
 
 ;; TODO: Maybe also in-string-p?
+
+
+;; Useful Commands
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun voicemacs-increase-text ()
+  (interactive)
+  (default-text-scale-mode 1)
+  (default-text-scale-increase))
+
+
+(defun voicemacs-decrease-text ()
+  (interactive)
+  (default-text-scale-mode 1)
+  (default-text-scale-decrease))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
