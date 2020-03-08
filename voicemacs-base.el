@@ -212,7 +212,7 @@ disabled."
     (add-hook 'voicemacs--sync-setup-hook setup)
     (when voicemacs-mode
       ;; Hook won't run if `voicemacs-mode' is already active.
-      (apply setup)))
+      (funcall setup)))
   (add-hook 'voicemacs--sync-teardown-hook teardown))
 
 
