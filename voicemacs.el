@@ -251,9 +251,17 @@ longer busy."
   (voicemacs--disable-sync-snippet-tables))
 
 
+(defun voicemacs-insert-snippet (template)
+  (let ((where (if (region-active-p)
+                   (cons (region-beginning) (region-end))
+                 (cons (point) (point)))))
+    (yas-expand-snippet template (car where) (cdr where))))
+
+
 (with-eval-after-load 'yasnippet
   (voicemacs--sync-add 'voicemacs--enable-sync-snippets
-                       'voicemacs--disable-sync-snippets))
+                       'voicemacs--disable-sync-snippets)
+  (voicemacs-expose-function 'voicemacs-insert-snippet))
 
 
 ;; Cursor in a Comment?
