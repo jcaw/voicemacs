@@ -149,9 +149,6 @@ If `full' is t, gets all data, not just the changes."
     result))
 
 
-(voicemacs-expose-function 'voicemacs-pull-data)
-
-
 (defun voicemacs--reset-data ()
   "Reset synchronization data to vanilla values."
   (setq voicemacs--unsynced-keys '())
@@ -278,6 +275,9 @@ functions."
   (remove-hook 'after-change-major-mode-hook func)
   (remove-hook 'post-command-hook func)
   (cancel-function-timers func))
+
+
+(voicemacs-expose-function 'voicemacs-pull-data)
 
 
 (provide 'voicemacs-base)
