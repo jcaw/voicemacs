@@ -3,6 +3,9 @@
 (require 'voicemacs-base)
 (require 'voicemacs-command)
 
+(with-eval-after-load 'helm
+  (require 'voicemacs-extend-helm))
+
 
 ;; Major Mode Sync
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
