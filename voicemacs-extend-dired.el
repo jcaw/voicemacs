@@ -1,4 +1,5 @@
 (require 'dired)
+(require 'cl)
 
 (require 'voicemacs-lib)
 (require 'voicemacs-base)
@@ -43,7 +44,7 @@
       (while (zerop (forward-line))
         ;; We only want to label files & directories - not other lines.
         (when (dired-move-to-filename)
-          (setq num-files (1+ num-files))))
+          (cl-incf num-files)))
       (length (number-to-string num-files)))))
 
 
@@ -67,7 +68,7 @@ buffers."
         (when (dired-move-to-filename)
           (voicemacs--dired-insert-number-overlay
            current-number max-number-width)
-          (setq current-number (1+ current-number)))))))
+          (cl-incf current-number))))))
 
 
 ;; TODO: Could make this more functional
