@@ -7,6 +7,8 @@
   (require 'voicemacs-extend-helm))
 (with-eval-after-load 'dired
   (require 'voicemacs-extend-dired))
+(with-eval-after-load 'company
+  (require 'voicemacs-extend-company))
 
 
 ;; Major Mode Sync
