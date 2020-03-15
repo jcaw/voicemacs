@@ -258,11 +258,13 @@ longer busy."
   (voicemacs--disable-sync-snippet-tables))
 
 
-(defun voicemacs-insert-snippet (template)
+(defun voicemacs-insert-snippet (snippet-name)
   (let ((where (if (region-active-p)
                    (cons (region-beginning) (region-end))
                  (cons (point) (point)))))
-    (yas-expand-snippet template (car where) (cdr where))))
+    (yas-expand-snippet
+     (yas-lookup-snippet snippet-name)
+     (car where) (cdr where))))
 
 
 (with-eval-after-load 'yasnippet
