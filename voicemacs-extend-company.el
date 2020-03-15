@@ -6,10 +6,40 @@
 (require 'voicemacs-lib)
 
 
-;; TODO: Sync this
+;; TODO: Maybe remove? Might be useful as an exposed method but not using it to
+;;   sync.
 (defun voicemacs-company-prompt-open? ()
   "Is the company prompt open?"
   (bound-and-true-p company-candidates))
+
+
+(defconst voicemacs--company-prompt-key 'company-prompt-open
+  "Voicemacs sync key to indicate whether the company prompt is open.")
+
+
+(defun voicemacs--update-company-prompt-t (&rest _)
+  (voicemacs--update-if-changed voicemacs--company-prompt-key t))
+
+
+(defun voicemacs--update-company-prompt-false (&rest _)
+  (voicemacs--update-if-changed voicemacs--company-prompt-key :json-false))
+
+
+(defun voicemacs--enable-sync-company-prompt ()
+  (add-hook 'company-completion-started-hook 'voicemacs--update-company-prompt-t)
+  (add-hook 'company-after-completion-hook 'voicemacs--update-company-prompt-false)
+  ;; Sync current state immediately.
+  (voicemacs--sync-company-prompt))
+
+
+(defun voicemacs--disable-sync-company-prompt ()
+  (remove-hook 'company-completion-started-hook 'voicemacs--update-company-prompt-t)
+  (remove-hook 'company-after-completion-hook 'voicemacs--update-company-prompt-false)
+  (voicemacs--update-if-changed voicemacs--company-prompt-key :json-null))
+
+
+(voicemacs--sync-add 'voicemacs--enable-sync-company-prompt
+                     'voicemacs--disable-sync-company-prompt)
 
 
 (defun voicemacs-company-select-number (number)
