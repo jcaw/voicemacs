@@ -43,7 +43,7 @@
                      'voicemacs--disable-sync-company-prompt)
 
 
-(defun voicemacs-company-select-number (number)
+(defun voicemacs-company-highlight (number)
   "Move selection to a numbered company candidate."
   (interactive "P")
   (company-set-selection (1- (+ number company-tooltip-offset))))
@@ -56,7 +56,7 @@
 
 
 (voicemacs-expose-function 'company-complete-number)
-(voicemacs-expose-function 'voicemacs-company-select-number)
+(voicemacs-expose-function 'voicemacs-company-highlight)
 (voicemacs-expose-function 'voicemacs-company-pop-doc)
 
 
