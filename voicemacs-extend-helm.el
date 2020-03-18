@@ -3,7 +3,7 @@
 (require 'voicemacs-base)
 
 
-(defun voicemacs-sync-helm-prompt ()
+(defun voicemacs-sync-helm-prompt (&rest _)
   "Sync whether the helm prompt is active."
   (voicemacs--update-if-changed
    'in-helm-prompt

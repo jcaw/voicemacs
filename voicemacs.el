@@ -202,7 +202,7 @@ structure."
   (voicemacs--update-if-changed 'active-yasnippet-tables (yas--modes-to-activate)))
 
 
-(defun voicemacs--queue-sync-snippet-tables ()
+(defun voicemacs--queue-sync-snippet-tables (&rest _)
   "Queue an update to the currently active snippet tables."
   (voicemacs--queue-once 'voicemacs--sync-snippet-tables))
 
