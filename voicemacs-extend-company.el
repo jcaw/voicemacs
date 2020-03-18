@@ -55,6 +55,7 @@
 
 
 (defun voicemacs-company-pop-doc (number)
+  "Show the `company-quickdoc' for a numbered candidate."
   (interactive "P")
   (voicemacs-company-select-number number)
   (company-quickhelp--show))
