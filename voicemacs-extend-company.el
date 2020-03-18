@@ -29,7 +29,8 @@
   (add-hook 'company-completion-started-hook 'voicemacs--update-company-prompt-t)
   (add-hook 'company-after-completion-hook 'voicemacs--update-company-prompt-false)
   ;; Sync current state immediately.
-  (voicemacs--sync-company-prompt))
+  (company-cancel)
+  (voicemacs--update-company-prompt-false))
 
 
 (defun voicemacs--disable-sync-company-prompt ()
