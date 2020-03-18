@@ -44,7 +44,9 @@ infinite loops on a recursive call."
             (voicemacs-helm-goto-line start-line t))
           (error "Candidate does not exist"))
         (setq last-line (voicemacs--helm-line-number)))))
-  (redisplay t))
+  ;; Redisplay & pause so the user can see we moved the selection.
+  (redisplay t)
+  (sit-for 0.1))
 
 
 (voicemacs-expose-function 'voicemacs-helm-goto-line)
