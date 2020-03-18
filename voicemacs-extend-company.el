@@ -55,8 +55,19 @@
   (company-quickhelp--show))
 
 
-(voicemacs-expose-function 'company-complete-number)
+(defun voicemacs-company-complete (number)
+  "Insert a company candidate by `NUMBER'.
+
+Like `company-complete-number', but gives visual feedback."
+  (interactive "P")
+  (voicemacs-company-select-number number)
+  (sit-for 0.1)
+  (company-complete))
+
+
+;; (voicemacs-expose-function 'company-complete-number)
 (voicemacs-expose-function 'voicemacs-company-highlight)
+(voicemacs-expose-function 'voicemacs-company-complete)
 (voicemacs-expose-function 'voicemacs-company-pop-doc)
 
 
