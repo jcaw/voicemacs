@@ -41,7 +41,7 @@ infinite loops on a recursive call."
         (when (= (voicemacs--helm-line-number) last-line)
           ;; No more candidates.
           (unless do-not-restore
-            (voicemacs--helm-goto-line start-line t))
+            (voicemacs-helm-goto-line start-line t))
           (error "Candidate does not exist"))
         (setq last-line (voicemacs--helm-line-number)))))
   (redisplay t))
