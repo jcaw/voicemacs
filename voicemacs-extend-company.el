@@ -46,7 +46,12 @@
 (defun voicemacs-company-highlight (number)
   "Move selection to a numbered company candidate."
   (interactive "P")
-  (company-set-selection (1- (+ number company-tooltip-offset))))
+  (if (called-interactively-p 'any)
+      (company-set-selection (+ company-tooltip-offset (- number 1)) t)
+    ;; `company-set-selection' has to be called interactively, or the selection
+    ;; won't show visually.
+    (let ((current-prefix-arg number))
+      (call-interactively 'voicemacs-company-highlight))))
 
 
 (defun voicemacs-company-pop-doc (number)
