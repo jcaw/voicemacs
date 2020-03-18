@@ -146,6 +146,13 @@ If `full' is t, gets all data, not just the changes."
                                           voicemacs--unsynced-keys))))
     (setq voicemacs--unsynced-keys '())
     (voicemacs--sync-title)
+    ;; FIX: When helm prompts are open, pulling doesn't update the title.
+    ;; Seems to be a weird race condition - redrawing the modeling fixes it.
+    ;;
+    ;; To be safe, apply this fix whenever we're in the minibuffer.
+    (when (eq major-mode 'minibuffer-inactive-mode)
+      ;; TODO: Check whether this bug only occurs on Windows.
+      (redraw-modeline))
     result))
 
 
