@@ -1,5 +1,7 @@
 (require 'helm)
 
+(require 'voicemacs-base)
+
 
 (defun voicemacs--helm-line-number ()
   "Line number of the current candidate."
