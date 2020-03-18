@@ -111,6 +111,8 @@ the function from ordinary timers."
   ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
   ;;   at a lower level?
   (push key voicemacs--unsynced-keys)
+  ;; Might still be busy. We can run on an idle timer to ensure we don't tell
+  ;; the user there's data available until they can actually pull it.
   (voicemacs--queue-once 'voicemacs--sync-title))
 
 
