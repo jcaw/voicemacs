@@ -276,6 +276,7 @@ functions."
   (add-hook 'after-change-major-mode-hook func)
   ;; This is a reasonable proxy for when we're switching the buffer.
   (add-hook 'post-command-hook func)
+  ;; Run it idly to catch events that fall through the net.
   (run-with-idle-timer 1 0 func))
 
 
