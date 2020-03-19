@@ -111,9 +111,13 @@ the function from ordinary timers."
   ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
   ;;   at a lower level?
   (push key voicemacs--unsynced-keys)
-  ;; Might still be busy. We can run on an idle timer to ensure we don't tell
-  ;; the user there's data available until they can actually pull it.
-  (voicemacs--queue-once 'voicemacs--sync-title))
+  ;; Emacs might be busy for a while yet. If we tell the user data is available
+  ;; now, they may not be able to pull it. Do it on a timer so it's flagged when
+  ;; the user is more likely to be able to pull it.
+  ;;
+  ;; Would use an idle timer for this, but then the title wouldn't update in
+  ;; e.g. the `helm-M-x' prompt.
+  (run-with-timer 0 nil 'voicemacs--sync-title))
 
 
 (defun voicemacs--update-if-changed (key value)
