@@ -16,9 +16,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+(defun voicemacs--mode-derivation-chain (mode)
+  "Get a list of `mode' plus all derivation ancestors."
+  (when mode
+    (append (list mode)
+            (voicemacs--mode-derivation-chain
+             (get mode 'derived-mode-parent)))))
+
+
 (defun voicemacs--sync-major-mode (&rest _)
   "Sync the current major mode."
-  (voicemacs--update-if-changed 'major-mode major-mode))
+  (voicemacs--update-if-changed
+   'major-mode-chain
+   (voicemacs--mode-derivation-chain major-mode))
+  (voicemacs--update-if-changed 'primary-major-mode major-mode))
 
 
 (defun voicemacs--enable-sync-major-mode ()
