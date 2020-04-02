@@ -13,5 +13,13 @@
           string))
 
 
+(defun voicemacs--bound-and-true-p (symbol)
+  "Is `symbol' both bound, and truthy?
+
+Like `bound-and-true-p', but a function, not a macro."
+  (and (boundp symbol)
+       (symbol-value symbol)))
+
+
 (provide 'voicemacs-lib)
 ;;; voicemacs-lib.el ends here
