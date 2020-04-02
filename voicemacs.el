@@ -1,3 +1,4 @@
+(require 'cl)
 (require 'default-text-scale)
 
 (require 'voicemacs-base)
@@ -40,10 +41,13 @@
 
 (defun voicemacs--active-minor-modes ()
   "Get the currently active minor modes."
-  (seq-filter (lambda (symbol)
-                (and (boundp symbol)
-                     (symbol-value symbol)))
-              (mapcar #'car minor-mode-alist)))
+  ;; Different packages register their minor modes in different lists, so we
+  ;; have to iterate over both.
+  (cl-union
+   (seq-filter 'voicemacs--bound-and-true-p
+               minor-mode-list)
+   (seq-filter 'voicemacs--bound-and-true-p
+               (mapcar #'car minor-mode-alist))))
 
 
 (defun voicemacs--sync-minor-modes (&rest _)
