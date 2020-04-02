@@ -67,6 +67,8 @@
 Like `company-complete-number', but gives visual feedback."
   (interactive "P")
   (voicemacs-company-select-number number)
+  ;; Sleep outside select-number so it doesn't slow down other selection
+  ;; commands (e.g. popping docs is already slow, don't want to increase that).
   (sit-for 0.1)
   (company-complete))
 
