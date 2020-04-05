@@ -342,6 +342,27 @@ This function uses a similar method to that used by Flyspell."
 ;; TODO: Maybe also in-string-p?
 
 
+;; Emacs Metadata
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Whether it's Doom/Spacemacs shouldn't change after init - only need to check
+;; once.
+(defun voicemacs--check-distribution ()
+  (voicemacs--update-if-changed
+   'is-spacemacs
+   (if (boundp 'spacemacs-version) t :json-false))
+
+  ;; TODO: Untested. Checks this actually works with doom.
+  (voicemacs--update-if-changed
+   'is-doom
+   (if (boundp 'doom-version) t :json-false)))
+
+(add-hook 'after-init-hook 'voicemacs--check-distribution)
+;; Check now in case the hook has been run.
+(voicemacs--check-distribution)
+
+
 ;; Useful Commands
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
