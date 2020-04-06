@@ -421,8 +421,13 @@ it is ignored. The text around the field will be returned."
   "Toggle whether the region is active or not."
   (interactive)
   (if (region-active-p)
-      (deactivate-mark)
-    (activate-mark)))
+      (progn
+        (deactivate-mark)
+        (message "Mark deactivated.")
+        t)
+    (activate-mark)
+    (message "Mark activated")
+    nil))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
