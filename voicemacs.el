@@ -422,7 +422,7 @@ it is ignored. The text around the field will be returned."
   (interactive)
   (if (region-active-p)
       (progn
-        (deactivate-mark)
+        (deactivate-mark t)
         (message "Mark deactivated.")
         t)
     (activate-mark)
