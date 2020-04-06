@@ -409,6 +409,14 @@ it is ignored. The text around the field will be returned."
 (voicemacs-expose-function 'voicemacs-surrounding-text)
 
 
+(defun voicemacs-switch-to-minibuffer ()
+  "Switch to minibuffer window (iff active)"
+  (interactive)
+  (when (active-minibuffer-window)
+    (select-frame-set-input-focus (window-frame (active-minibuffer-window)))
+    (select-window (active-minibuffer-window))))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
