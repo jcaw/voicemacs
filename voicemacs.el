@@ -417,6 +417,14 @@ it is ignored. The text around the field will be returned."
     (select-window (active-minibuffer-window))))
 
 
+(defun voicemacs-toggle-region ()
+  "Toggle whether the region is active or not."
+  (interactive)
+  (if (region-active-p)
+      (deactivate-mark)
+    (activate-mark)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
