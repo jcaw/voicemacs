@@ -363,7 +363,7 @@ This function uses a similar method to that used by Flyspell."
 (voicemacs--check-distribution)
 
 
-;; Useful Commands
+;; Misc Commands
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
