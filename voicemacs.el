@@ -379,6 +379,36 @@ This function uses a similar method to that used by Flyspell."
   (default-text-scale-decrease))
 
 
+(defun voicemacs--unmodified-yas-field-p ()
+  "Is the point currently in an unmodified Yasnippet field?"
+  (let ((current-field (bound-and-true-p yas-current-field)))
+    (and current-field
+         (not (yas--field-modified-p current-field))
+         (= (point) (yas--field-start current-field)))))
+
+
+(cl-defun voicemacs-surrounding-text (&key (chars-before 30000)
+                                           (chars-after 30000))
+  "Get `num-chars' on each side of point.
+
+If the point is in an unaltered yasnippet field, the field will
+be altered as soon as the user starts typing - for this reason,
+it is ignored. The text around the field will be returned."
+  `((text-before . ,(buffer-substring-no-properties
+                     (max (point-min) (- (point) chars-before))
+                     (if (voicemacs--unmodified-yas-field-p)
+                         (yas--field-start (yas-current-field))
+                       (point))))
+    (text-after . ,(buffer-substring-no-properties
+                    (if (voicemacs--unmodified-yas-field-p)
+                        (yas--field-start (yas-current-field))
+                      (point))
+                    (min (point-max) (+ (point) chars-after))))))
+
+
+(voicemacs-expose-function 'voicemacs-surrounding-text)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
