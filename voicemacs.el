@@ -430,6 +430,42 @@ it is ignored. The text around the field will be returned."
     nil))
 
 
+(defun voicemacs-isearch-dwim (&optional prefix)
+  "If isearching, repeat direction. Otherwise, start a forward isearch.
+
+When starting a new search, passes the prefix to the underlying
+isearch function."
+  (interactive "P")
+  (if isearch-mode
+      ;; Call interactively so we can use command injection.
+      (if isearch-forward
+          (call-interactively 'isearch-repeat-forward)
+        (call-interactively 'isearch-repeat-backward))
+    (isearch-forward prefix)))
+
+
+(defun voicemacs-isearch-forward (&optional prefix)
+  "RPC isearch command. Start or repeat as needed.
+
+Prefix will be passed to new search."
+  (interactive "P")
+  (if isearch-mode
+      ;; Call interactively so we can use command injection.
+      (call-interactively 'isearch-repeat-forward)
+    (isearch-forward prefix)))
+
+
+(defun voicemacs-isearch-backward (&optional prefix)
+  "RPC isearch command. Start or repeat as needed.
+
+Prefix will be passed to new search."
+  (interactive "P")
+  (if isearch-mode
+      ;; Call interactively so we can use command injection.
+      (call-interactively 'isearch-repeat-backward)
+    (isearch-backward prefix)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
