@@ -137,5 +137,125 @@ buffers."
                 (voicemacs--dired-numbers-mode-teardown)))
 
 
+;; Custom Dired Commands
+;; ---------------------
+
+
+(defun voicemacs-create-new-file (file-list)
+  ;; Originally written by Xah Lee
+  (defun exsitp-untitled-x (file-list cnt)
+    (while (and (car file-list)
+                (not (string= (car file-list)
+                              (number-to-string cnt))))
+      (setq file-list (cdr file-list)))
+    (car file-list))
+
+  (defun exsitp-untitled (file-list)
+    (while (and (car file-list) (not (string= (car file-list) "")))
+      (setq file-list (cdr file-list)))
+    (car file-list))
+
+  (if (not (exsitp-untitled file-list))
+      ""
+    (let ((cnt 2))
+      (while (exsitp-untitled-x file-list cnt)
+        (setq cnt (1+ cnt)))
+      (concat "" (number-to-string cnt) ""))))
+
+
+(defun voicemacs-dired-create-file (file)
+  (interactive
+   (list (read-file-name "Create file: " (concat (dired-current-directory)
+                                                 (voicemacs-create-new-file
+                                                  (directory-files
+                                                   (dired-current-directory)))))))
+  (write-region "" nil (expand-file-name file) t)
+  (dired-add-file file)
+  (revert-buffer)
+  (dired-goto-file (expand-file-name file)))
+
+
+(defun voicemacs--open-files-external (file-list)
+  "Open a list of files in an external app."
+  ;; Originally written by Xah Lee
+  (cond (voicemacs-on-windows
+         (mapc (lambda (file-path)
+                 (w32-shell-execute "open" (replace-regexp-in-string
+                                            "/" "\\" file-path t t)))
+               file-list))
+        (voicemacs-on-mac
+         (mapc (lambda (file-path)
+                 (shell-command (format "open \"%s\"" file-path)))
+               file-list))
+        (voicemacs-on-linux
+         (mapc (lambda (file-path)
+                 (let ((process-connection-type nil))
+                   (start-process "" nil "xdg-open" file-path)))
+               file-list))))
+
+
+(defun voicemacs-dired-open-in-external-app ()
+  "Open all marked files in an external app.
+
+If no files are marked, opens the current file.
+
+If buffer is not in dired mode, just opens the current file."
+  (interactive)
+  ;; Originally written by Xah Lee
+  (let* ((files (if (eq major-mode 'dired-mode)
+                    (dired-get-marked-files)
+                  (list (buffer-file-name))))
+         (num-files (length files)))
+    (when (or (<= file-list 5)
+              (y-or-n-p (format "Open %s files? " num-files)))
+      (voicemacs--open-files-external files))))
+
+
+(defun voicemacs-dired-open-this-file-in-external-app ()
+  "Open the current file only in an external app."
+  (interactive)
+  (voicemacs--open-files-external (list (dired-filename-at-point))))
+
+
+(defun voicemacs-dired-show-in-desktop ()
+  "Show current file in the OS's default file manager."
+  (interactive)
+  ;; Originally written by Xah Lee
+  (cond
+   (voicemacs-on-windows
+    (w32-shell-execute "explore" (replace-regexp-in-string "/" "\\" default-directory t t)))
+   (voicemacs-on-mac (shell-command "open ."))
+   (voicemacs-on-linux
+    (let ((process-connection-type nil)
+          (openFileProgram (if (file-exists-p "/usr/bin/gvfs-open")
+                               "/usr/bin/gvfs-open"
+                             "/usr/bin/xdg-open")))
+      (start-process "" nil openFileProgram "."))
+    ;; (shell-command "xdg-open .") ;; 2013-02-10 this sometimes froze emacs till the folder is closed. ➢ for example: with nautilus
+    )))
+
+
+(defun voicemacs-dired-open-in-terminal ()
+  "Open the current dir in a new terminal window."
+  (interactive)
+  (cond
+   ((string-equal system-type "windows-nt")
+    (message "Microsoft Windows not supported. File a bug report or pull request."))
+   ((string-equal system-type "darwin")
+    (message "Mac not supported. File a bug report or pull request."))
+   ((string-equal system-type "gnu/linux")
+    (let ((process-connection-type nil))
+      (start-process "" nil "x-terminal-emulator"
+                     (concat "--working-directory=" default-directory))))))
+
+
+(defun voicemacs-dired-open-other-window-keep-focus ()
+  "Keeping focus in Dired, open a file in the other window."
+  (interactive)
+  (let ((dired-window (frame-selected-window)))
+    (dired-find-file-other-window)
+    (select-window dired-window)))
+
+
 (provide 'voicemacs-extend-dired)
 ;;; voicemacs-extend-dired.el ends here
