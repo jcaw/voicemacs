@@ -8,7 +8,7 @@ Many of these features are personal hacks, polished for publishing. They are tai
 
 ## How Does it Work?
 
-Voicemacs is very much a work-in-progress. It's not stable or documented. The best way to understand it is probably to look at the client in my [Talon config](https://github.com/jcaw/talon_config/tree/master/newapi/emacs/utils), and the source code. Start with `voicemacs-base.el`.
+Voicemacs is very much a work-in-progress. It's not stable or documented. The best way to understand it is probably to look at the client in my [Talon config](https://github.com/jcaw/talon_config/tree/master/emacs/utils), and the source code. Start with `voicemacs-base.el`.
 
 With that said, here's a rough overview. Voicemacs publishes an HTTP server which runs within Emacs, via [Porthole](https://github.com/jcaw/porthole). You interact by sending HTTP requests to the server. It's one-way, with Emacs as the destination, so when data is available to sync, Voicemacs will set a flag in your Emacs title. Ping Emacs to pull the new data.
 
