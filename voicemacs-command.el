@@ -43,7 +43,8 @@ Arguments:
     (unless (or (integerp prefix-arg)
                 ;; Prefix arguments might look like '(4) or '(16)
                 (and (listp prefix-arg)
-                     (eq 1 (length prefix-arg)))
+                     (eq 1 (length prefix-arg))
+                     (integerp (car prefix-arg)))
                 (equal prefix-arg "-")
                 ;; Also allow no prefix argument.
                 (eq prefix-arg nil))
