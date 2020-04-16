@@ -49,8 +49,9 @@ Arguments:
                 ;; Also allow no prefix argument.
                 (eq prefix-arg nil))
       (error (format
-              "Prefix arguments may only be numbers, a list such as '(16) or a dash. Was: %s"
-              prefix-arg)))
+              "Prefix arguments may only be numbers, a list such as '(16) or a dash. Was: %s, type: %s"
+              prefix-arg
+              (type-of prefix-arg))))
     (voicemacs--inject-command command-symbol prefix-arg)
     ;; The return value doesn't really matter.
     "Command injected successfully."))
