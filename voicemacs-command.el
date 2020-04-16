@@ -99,6 +99,8 @@ key)."
   (let* ((command-event-data (cdr (aref (this-command-keys-vector) 0)))
          (command-name (nth 0 command-event-data))
          (prefix-arg (nth 1 command-event-data)))
+    ;; Usually this shouldn't be called from Elisp code, but we want Emacs to
+    ;; treat this as a normal command as much as possible.
     (execute-extended-command prefix-arg (format "%s" command-name))))
 
 
