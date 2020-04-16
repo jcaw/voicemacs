@@ -72,7 +72,7 @@ interactive command, as if it was called by a keypress."
 
 
 (defun voicemacs--inject-event (event)
-  "Inject an event into the command loop (at the end)."
+  "Inject an event into the command loop (at the chronological end)."
   (setq unread-command-events (cons event unread-command-events)))
 
 
