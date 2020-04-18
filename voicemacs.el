@@ -379,12 +379,14 @@ This function uses a similar method to that used by Flyspell."
   (default-text-scale-decrease))
 
 
-(defun voicemacs--unmodified-yas-field-p ()
-  "Is the point currently in an unmodified Yasnippet field?"
-  (let ((current-field (bound-and-true-p yas-current-field)))
+(defun voicemacs--yas-will-clear-field? ()
+  "Is the point in a yas field that will be cleared on insert?"
+  (let ((current-field (ignore-errors (yas-current-field))))
     (and current-field
          (not (yas--field-modified-p current-field))
-         (= (point) (yas--field-start current-field)))))
+         ;; TODO: Imperfect, if user has moved then returned to the start it
+         ;; won't be erased on insert.
+         (eq (point) (marker-position (yas--field-start current-field))))))
 
 
 (cl-defun voicemacs-surrounding-text (&key (chars-before 30000)
@@ -394,16 +396,18 @@ This function uses a similar method to that used by Flyspell."
 If the point is in an unaltered yasnippet field, the field will
 be altered as soon as the user starts typing - for this reason,
 it is ignored. The text around the field will be returned."
-  `((text-before . ,(buffer-substring-no-properties
-                     (max (point-min) (- (point) chars-before))
-                     (if (voicemacs--unmodified-yas-field-p)
-                         (yas--field-start (yas-current-field))
+  (let ((before-end (if (voicemacs--yas-will-clear-field?)
+                        (marker-position (yas--field-start (yas-current-field)))
+                      (point)))
+        (after-start (if (voicemacs--yas-will-clear-field?)
+                         (marker-position (yas--field-end (yas-current-field)))
                        (point))))
-    (text-after . ,(buffer-substring-no-properties
-                    (if (voicemacs--unmodified-yas-field-p)
-                        (yas--field-start (yas-current-field))
-                      (point))
-                    (min (point-max) (+ (point) chars-after))))))
+    `((text-before . ,(buffer-substring-no-properties
+                       (max (point-min) (- before-end chars-before))
+                       before-end))
+      (text-after . ,(buffer-substring-no-properties
+                      after-start
+                      (min (point-max) (+ after-start chars-after)))))))
 
 
 (voicemacs-expose-function 'voicemacs-surrounding-text)
