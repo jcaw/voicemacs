@@ -297,7 +297,11 @@ longer busy."
   "Synchronize the valid `org-todo' keywords."
   (voicemacs--update-if-changed
    'org-todo-keywords
-   (bound-and-true-p org-todo-keywords)))
+   (if (boundp 'org-todo-keywords)
+       (append org-todo-keywords
+               ;; Also add any buffer-local TODO keywords.
+               (when (bound-and-true-p org-todo-keywords-1)
+                 (list (cons 'sequence org-todo-keywords-1)))))))
 
 
 (defun voicemacs--queue-sync-org-todo (&rest _)
