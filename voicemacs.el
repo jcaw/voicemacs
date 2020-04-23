@@ -507,6 +507,15 @@ Prefix will be passed to new search."
     (isearch-backward prefix)))
 
 
+;; HACK: This can be used by the client to hold off on RPC calls until all
+;;   existing input has been processed.
+(defun voicemacs-input-pending? ()
+  "Has all existing input been processed?"
+  (if (input-pending-p) t :json-false))
+
+(voicemacs-expose-function 'voicemacs-input-pending?)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
