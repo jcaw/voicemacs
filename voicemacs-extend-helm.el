@@ -56,7 +56,7 @@ infinite loops on a recursive call."
   (when helm-alive-p
     (with-helm-buffer
       ;; TODO: Maybe make the face bolder
-      (setq display-line-numbers 'absolute))))
+      (setq-local display-line-numbers 'absolute))))
 
 
 (defun voicemacs--helm-numbers-mode-setup ()
@@ -70,7 +70,7 @@ infinite loops on a recursive call."
   ;; Also disable any active numbers
   (when helm-alive-p
     (with-helm-buffer
-      (setq display-line-numbers nil))))
+      (setq-local display-line-numbers nil))))
 
 
 (define-minor-mode voicemacs-helm-numbers-mode
