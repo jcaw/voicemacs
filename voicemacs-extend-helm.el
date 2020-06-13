@@ -52,10 +52,28 @@ infinite loops on a recursive call."
 (voicemacs-expose-function 'voicemacs-helm-goto-line)
 
 
+(defun voicemacs--local-override-face (face &rest overrides)
+  "Override a face in the current buffer only."
+  (setq-local face-remapping-alist
+              (cons `(,face ,@overrides)
+                    ;; Remove any overrides for this face that already exist.
+                    (-filter (lambda (mapping)
+                               (not (eq (car mapping) face)))
+                             face-remapping-alist))))
+
+
 (defun voicemacs--show-helm-numbers ()
   (when helm-alive-p
     (with-helm-buffer
-      ;; TODO: Maybe make the face bolder
+      ;; Default line numbers are subtle. These are selection numbers, make them
+      ;; stand out.
+      ;;
+      ;; TODO: Extract line numbers face?
+      (voicemacs--local-override-face 'line-number 'bold 'font-lock-keyword-face)
+      (voicemacs--local-override-face 'line-number-current-line
+                                      'bold
+                                      'helm-selection
+                                      'font-lock-keyword-face)
       (setq-local display-line-numbers 'absolute))))
 
 
