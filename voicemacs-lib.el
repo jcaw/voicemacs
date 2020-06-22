@@ -21,5 +21,13 @@ Like `bound-and-true-p', but a function, not a macro."
        (symbol-value symbol)))
 
 
+(defmacro voicemacs--first-result (result-form &rest body)
+  "Perform `RESULT-FORM' then `BODY', but return the result of `RESULT-FORM'."
+  (declare (indent 1))
+  `(let ((result ,result-form))
+     ,@body
+     result))
+
+
 (provide 'voicemacs-lib)
 ;;; voicemacs-lib.el ends here

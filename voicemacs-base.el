@@ -146,10 +146,10 @@ the function from ordinary timers."
 If `full' is t, gets all data, not just the changes."
   ;; TODO: Optimize this so we check whether the data is actually worth
   ;;   transferring? Compare against a shadow state?
-  (let ((result (if full
-                    voicemacs--data
-                  (voicemacs--hash-subset voicemacs--data
-                                          voicemacs--unsynced-keys))))
+  (voicemacs--first-result (if full
+                              voicemacs--data
+                            (voicemacs--hash-subset voicemacs--data
+                                                    voicemacs--unsynced-keys))
     (setq voicemacs--unsynced-keys '())
     (voicemacs--sync-title)
     ;; FIX: When helm prompts are open, pulling doesn't update the title.
@@ -158,8 +158,7 @@ If `full' is t, gets all data, not just the changes."
     ;; To be safe, apply this fix whenever we're in the minibuffer.
     (when (eq major-mode 'minibuffer-inactive-mode)
       ;; TODO: Check whether this bug only occurs on Windows.
-      (redraw-modeline))
-    result))
+      (redraw-modeline))))
 
 
 (defun voicemacs--reset-data ()

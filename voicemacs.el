@@ -130,12 +130,10 @@ We can use this to temporarily disable it, reducing overhead."
   ;; could be important, like `require' or `load'.
   (ignore-errors
     (advice-remove 'defun 'voicemacs--queue-sync-commands))
-  (let ((result (apply original-func args)))
+  (voicemacs--first-result (apply original-func args)
     (ignore-errors
       (advice-add 'defun :after 'voicemacs--queue-sync-commands)
       ;; Since we suppressed it, we should manually queue once.
-      (voicemacs--queue-sync-commands))
-    result))
 
 
 (defun voicemacs--enable-sync-commands ()
