@@ -217,12 +217,12 @@ Don't hook functions to this hook directly - use
 (defun voicemacs--sync-add (setup teardown)
   "Add a new data synchronizer to `voicemacs-mode'.
 
-`setup' is the function to run when synchronization is enabled.
-`teardown' is the function to run when synchornization is
+`SETUP' is the function to run when synchronization is enabled.
+`TEARDOWN' is the function to run when synchornization is
 disabled.
 
 Note that if `voicemacs-mode' is active, any previous versions of
-`setup' will not be torn down. That needs to be done manually
+`SETUP' will not be torn down. That needs to be done manually
 before calling `voicemacs--sync-add'."
   ;; Need to fire it manually if `voicemacs-mode' is already active.
   (when voicemacs-mode
