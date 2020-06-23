@@ -74,54 +74,48 @@
   (voicemacs--mapatoms 'commandp))
 
 
-;; TODO: Repeating concepts here. Turn this into a macro.
-(defun voicemacs--sync-commands ()
-  "Sync defined commands, iff they've changed."
-  (voicemacs--update-if-changed 'defined-commands (voicemacs--defined-commands)))
+(defun voicemacs--temp-disable-name (func)
+  "Helper for the `*-lazy-advise-defun' functions."
+  (voicemacs--format-symbol "voicemacs--temp-disable-%s" func))
 
 
-(defun voicemacs--queue-sync-commands (&rest _)
-  ;; Command definitions will be relatively rare after startup - we don't need
-  ;; to update the list quickly. Delay more than normal to reduce visible
-  ;; overhead.
-  (voicemacs--queue-once 'voicemacs--sync-commands
-                         :time 1))
+(defun voicemacs--lazy-advise-defun (func)
+  "Advise `defun', but suppress the advice when entire files are loaded.
+
+When loading many function definitions, we may not wish to run
+the advice with every call to `defun'.
+
+Advice will be run `:after' defun."
+  (advice-add 'defun :after func)
+  ;; Create a function to temporarily disable the advice we've given `defun'.
+  ;; This function must be added as `:around' advice.
+  (let ((temp-disable-func-name (voicemacs--temp-disable-name func)))
+    (eval `(defun ,temp-disable-func-name (wrapped-func &rest args)
+             (ignore-errors (advice-remove 'defun ,func))
+             (voicemacs--first-result (apply wrapped-func args)
+               (ignore-errors
+                 (advice-add 'defun :after ,func)
+                 ;; Since we suppressed it, we should manually queue once.
+                 (,func)))))
+    (advice-add 'require :around temp-disable-func-name)
+    (advice-add 'load :around temp-disable-func-name)))
 
 
-(defun voicemacs--temp-disable-command-sync (original-func &rest args)
-  "Temporarily stop syncing commands after every `defun'.
-
-When loading many function definitions, we don't want to be
-pushing the command sync onto a timer after every single `defun'.
-We can use this to temporarily disable it, reducing overhead."
-  ;; Ignore errors so we never affect/interrupt the underlying command - it
-  ;; could be important, like `require' or `load'.
-  (ignore-errors
-    (advice-remove 'defun 'voicemacs--queue-sync-commands))
-  (voicemacs--first-result (apply original-func args)
-    (ignore-errors
-      (advice-add 'defun :after 'voicemacs--queue-sync-commands)
-      ;; Since we suppressed it, we should manually queue once.
+(defun voicemacs--undo-lazy-advise-defun (func)
+  "Undo the effects of `voicemacs--lazy-advise-defun'."
+  (let ((temp-disable-func-name (voicemacs--temp-disable-name func)))
+    (advice-remove 'require temp-disable-func-name)
+    (advice-remove 'load temp-disable-func-name)))
 
 
-(defun voicemacs--enable-sync-commands ()
-  (advice-add 'defun :after 'voicemacs--queue-sync-commands)
-  ;; When we load a file, there's lots of function definitions. Don't need to
-  ;; sync after every one.
-  (advice-add 'require :around 'voicemacs--temp-disable-command-sync)
-  (advice-add 'load :around 'voicemacs--temp-disable-command-sync)
-  ;; Sync current state immediately.
-  (voicemacs--queue-sync-commands))
-
-
-(defun voicemacs--disable-sync-commands ()
-  (advice-remove 'defun 'voicemacs--queue-sync-commands)
-  (advice-remove 'require 'voicemacs--remove-command-sync-advice)
-  (advice-remove 'load 'voicemacs--remove-command-sync-advice))
-
-
-(voicemacs--sync-add 'voicemacs--enable-sync-commands
-                     'voicemacs--disable-sync-commands)
+(voicemacs-define-sync defined-commands
+  :update (voicemacs--defined-commands)
+  :enable (voicemacs--lazy-advise-defun sync-func)
+  :disable (voicemacs--undo-lazy-advise-defun sync-func)
+  :defer t
+  ;; Command definitions will be relatively rare after startup. Delay more than
+  ;; normal to reduce visible overhead. Cheating, but user shouldn't notice.
+  :delay 1)
 
 
 ;; Yasnippets Sync
