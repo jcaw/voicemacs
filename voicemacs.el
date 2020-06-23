@@ -176,9 +176,19 @@ structure."
     :update (yas--modes-to-activate)
     :defer t)
 
-  (voicemacs-define-sync-change-buffer yasnippets
+  (voicemacs-define-sync yasnippets
     :update (voicemacs--get-snippets)
     :defer t)
+    :enable (progn
+              (add-hook 'yas-after-reload-hook sync-func)
+              ;; These seem to be the two lowest-level functions that are used
+              ;; to add & remove (and update) snippets.
+              (advice-add 'yas--add-template :after sync-func)
+              (advice-add 'yas--remove-template-by-uuid :after sync-func))
+    :disable (progn
+               (remove-hook 'yas-after-reload-hook sync-func)
+               (advice-remove 'yas--add-template sync-func)
+               (advice-remove 'yas--remove-template-by-uuid sync-func))
 
   (voicemacs-expose-function 'voicemacs-insert-snippet))
 
