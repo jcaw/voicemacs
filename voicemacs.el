@@ -202,35 +202,15 @@ structure."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun voicemacs--sync-org-todo (&rest _)
-  "Synchronize the valid `org-todo' keywords."
-  (voicemacs--update-if-changed
-   'org-todo-keywords
-   (if (boundp 'org-todo-keywords)
-       (append org-todo-keywords
-               ;; Also add any buffer-local TODO keywords.
-               (when (bound-and-true-p org-todo-keywords-1)
-                 (list (cons 'sequence org-todo-keywords-1)))))))
-
-
-(defun voicemacs--queue-sync-org-todo (&rest _)
-  "Queue a sync of the org TODO keywords."
-  (voicemacs--queue-once 'voicemacs--sync-org-todo))
-
-
-(defun voicemacs--enable-sync-org-todo ()
-  "Enable synchronization of valid org TODO labels."
-  (voicemacs--hook-change-buffer 'voicemacs--queue-sync-org-todo))
-
-
-(defun voicemacs--disable-sync-org-todo ()
-  "Disable synchronization of valid org TODO labels."
-  (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-org-todo))
-
-
 (with-eval-after-load 'org
-  (voicemacs--sync-add 'voicemacs--enable-sync-org-todo
-                       'voicemacs--disable-sync-org-todo)
+  (voicemacs-define-sync-change-buffer org-todo-keywords
+    :update (if (boundp 'org-todo-keywords)
+                (append org-todo-keywords
+                        ;; Also add any buffer-local TODO keywords.
+                        (when (bound-and-true-p org-todo-keywords-1)
+                          (list (cons 'sequence org-todo-keywords-1)))))
+    :defer t)
+
   (voicemacs-expose-function 'org-todo))
 
 
