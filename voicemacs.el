@@ -57,6 +57,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;; TODO: Extract to lib
 (defun voicemacs--mapatoms (func &optional obarray-)
   (let ((matches '()))
     (mapatoms (lambda (atom)
