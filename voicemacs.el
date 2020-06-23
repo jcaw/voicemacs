@@ -242,30 +242,15 @@ This function uses a similar method to that used by Flyspell."
    )
 
 
-;; TODO: Forces regular syncs when we move cursor through a comment. That's
-;;   slow, creates choppiness. Put this info in the title?
-(defun voicemacs--sync-in-comment (&rest _)
-  "Sync whether the cursor is in a comment."
-  (voicemacs--update-if-changed
-   'in-comment
-   ;; Sending over the wire, so we need True or False, not truthiness
-   (if (voicemacs-in-comment-p) t :json-false)))
-
-
-(defun voicemacs--enable-sync-in-comment ()
-  ;; Quickly sync whenever idle.
-  (run-with-idle-timer 0 0 'voicemacs--sync-in-comment))
-
-
-(defun voicemacs--disable-sync-in-comment ()
-  (cancel-function-timers 'voicemacs--sync-in-comment))
-
-
-(voicemacs--sync-add 'voicemacs--enable-sync-in-comment
-                     'voicemacs--disable-sync-in-comment)
-
-
 ;; TODO: Maybe also in-string-p?
+(voicemacs-define-sync in-comment
+ ;; Sending over the wire, so we need True or False, not truthiness
+ :update (if (voicemacs-in-comment-p) t :json-false)
+ :enable (run-with-idle-timer 0 0 sync-func)
+ :disable (cancel-function-timers sync-func)
+ ;; TODO: Forces regular syncs when we move cursor through a comment. can be
+ ;;   slow, creates choppiness. Put this info in the title?
+ :defer nil)
 
 
 ;; Emacs Metadata
