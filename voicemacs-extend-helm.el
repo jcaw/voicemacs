@@ -3,23 +3,9 @@
 (require 'voicemacs-base)
 
 
-(defun voicemacs-sync-helm-prompt (&rest _)
-  "Sync whether the helm prompt is active."
-  (voicemacs--update-if-changed
-   'in-helm-prompt
-   (bound-and-true-p helm-alive-p)))
-
-
-(defun voicemacs-enable-sync-helm-prompt (&rest _)
-  (voicemacs--hook-change-buffer 'voicemacs-sync-helm-prompt))
-
-
-(defun voicemacs-disable-sync-helm-prompt (&rest _)
-  (voicemacs--unhook-change-buffer 'voicemacs-sync-helm-prompt))
-
-
-(voicemacs--sync-add 'voicemacs-enable-sync-helm-prompt
-                     'voicemacs-disable-sync-helm-prompt)
+(voicemacs-define-sync-change-buffer in-helm-prompt
+  :update (bound-and-true-p helm-alive-p)
+  :defer nil)
 
 
 (defun voicemacs--helm-line-number ()
