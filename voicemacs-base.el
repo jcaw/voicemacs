@@ -404,6 +404,25 @@ source."
        (voicemacs--sync-add enable-sync-func disable-sync-func))))
 
 
+(cl-defmacro voicemacs-define-sync-change-buffer (key &key
+                                                      (update 'NOT-PROVIDED)
+                                                      (defer t)
+                                                      (delay nil))
+  "Add a data key that synchronizes on buffer change.
+
+Like `voicemacs-define-sync', but `:enable' and `:disable' are
+handled for you - they will bind `sync-func' to a buffer change.
+See `voicemacs-define-sync' for documentation on the remaining
+parameters."
+  (declare (indent 1))
+  `(voicemacs-define-sync ,key
+     :update ,update
+     :enable (voicemacs--hook-change-buffer sync-func)
+     :disable (voicemacs--unhook-change-buffer sync-func)
+     :defer ,defer
+     :delay ,delay))
+
+
 (define-minor-mode voicemacs-mode
   "Minor mode to communicate with voice recognition software."
   :group 'voicemacs
