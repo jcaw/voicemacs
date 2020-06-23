@@ -177,67 +177,6 @@ structure."
     snippets))
 
 
-(defun voicemacs--sync-snippet-tables ()
-  "Update voicemacs with the currently active snippet tables."
-  (voicemacs--update-if-changed 'active-yasnippet-tables (yas--modes-to-activate)))
-
-
-(defun voicemacs--queue-sync-snippet-tables (&rest _)
-  "Queue an update to the currently active snippet tables."
-  (voicemacs--queue-once 'voicemacs--sync-snippet-tables))
-
-
-(defun voicemacs--sync-snippets ()
-  "Update voicemacs with all registered snippets.
-
-New snippets will only be pushed if they've changed. This
-function can be slow, so don't run it regularly."
-  ;; Compare JSON encodings because we don't know what types to expect -
-  ;; difficult to compare equality. What matters are JSON forms. The question we
-  ;; are asking is, "do we need to send new JSON data to the client?"
-  (voicemacs--update-if-changed 'yasnippets (voicemacs--get-snippets)))
-
-
-(defun voicemacs--queue-snippet-sync (&rest _)
-  "Sync snippets on an idle timer.
-
-Syncing snippets takes a long time so we generally want to do it
-once, after all snippet updates have been applied and Emacs is no
-longer busy."
-  (voicemacs--queue-once 'voicemacs--sync-snippets))
-
-
-(defun voicemacs--enable-sync-snippet-tables ()
-  "Enable synchronization of the active yasnippet tables."
-  ;; TODO: Queue this? May not be worth it, not a slow function.
-  (voicemacs--hook-change-buffer 'voicemacs--queue-sync-snippet-tables))
-
-
-(defun voicemacs--disable-sync-snippet-tables ()
-  "Disable synchronization of the active yasnippet tables."
-  (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-snippet-tables))
-
-
-(defun voicemacs--enable-sync-snippets ()
-  "Enable synchronization of yasnippets."
-  (add-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
-  ;; These seem to be the two lowest-level functions that are used to add &
-  ;; remove (and update) snippets.
-  (advice-add 'yas--add-template :after 'voicemacs--queue-snippet-sync)
-  (advice-add 'yas--remove-template-by-uuid :after 'voicemacs--queue-snippet-sync)
-  ;; Sync current state immediately
-  (voicemacs--sync-snippets)
-  (voicemacs--enable-sync-snippet-tables))
-
-
-(defun voicemacs--disable-sync-snippets ()
-  "Disable synchronization of yasnippets."
-  (remove-hook 'yas-after-reload-hook 'voicemacs--queue-snippet-sync)
-  (advice-remove 'yas--add-template 'voicemacs--queue-snippet-sync)
-  (advice-remove 'yas--remove-template-by-uuid 'voicemacs--queue-snippet-sync)
-  (voicemacs--disable-sync-snippet-tables))
-
-
 (defun voicemacs-insert-snippet (snippet-name)
   (let ((where (if (region-active-p)
                    (cons (region-beginning) (region-end))
@@ -248,10 +187,15 @@ longer busy."
 
 
 (with-eval-after-load 'yasnippet
-  (voicemacs--sync-add 'voicemacs--enable-sync-snippets
-                       'voicemacs--disable-sync-snippets)
-  (voicemacs-expose-function 'voicemacs-insert-snippet))
+  (voicemacs-define-sync-change-buffer active-yasnippet-tables
+    :update (yas--modes-to-activate)
+    :defer t)
 
+  (voicemacs-define-sync-change-buffer yasnippets
+    :update (voicemacs--get-snippets)
+    :defer t)
+
+  (voicemacs-expose-function 'voicemacs-insert-snippet))
 
 
 ;; Org-mode
