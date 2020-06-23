@@ -178,7 +178,6 @@ structure."
 
   (voicemacs-define-sync yasnippets
     :update (voicemacs--get-snippets)
-    :defer t)
     :enable (progn
               (add-hook 'yas-after-reload-hook sync-func)
               ;; These seem to be the two lowest-level functions that are used
@@ -189,6 +188,9 @@ structure."
                (remove-hook 'yas-after-reload-hook sync-func)
                (advice-remove 'yas--add-template sync-func)
                (advice-remove 'yas--remove-template-by-uuid sync-func))
+    :defer t
+    ;; This is an expensive operation, don't fire during every sit.
+    :delay 0.1)
 
   (voicemacs-expose-function 'voicemacs-insert-snippet))
 
