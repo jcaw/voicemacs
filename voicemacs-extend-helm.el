@@ -92,5 +92,20 @@ Incompatible with `helm-display-line-numbers-mode'."
 ;; TODO: System for enabling by default?
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; TODO: Maybe make a generalised method to invoke nonblocking RPC commands
+(defun voicemacs-helm-swoop (query)
+  "Run `helm-swoop' with a specific `query' on a timer.
+
+Allows helm-swoop to be invoked via RPC without blocking."
+  ;; Type check because it's delayed.
+  (assert (stringp query))
+  (run-with-timer 0 nil 'helm-swoop :query query))
+
+(voicemacs-expose-function 'voicemacs-helm-swoop)
+
+
 (provide 'voicemacs-extend-helm)
 ;;; voicemacs-extend-helm.el ends here.
