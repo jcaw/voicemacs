@@ -48,29 +48,9 @@
                (mapcar #'car minor-mode-alist))))
 
 
-(defun voicemacs--sync-minor-modes (&rest _)
-  "Synchronize the active minor modes."
-  (voicemacs--update-if-changed 'minor-modes (voicemacs--active-minor-modes)))
-
-
-(defun voicemacs--queue-sync-minor-modes (&rest _)
-  "Queue synchronization of active minor modes."
-  (voicemacs--queue-once 'voicemacs--sync-minor-modes))
-
-
-(defun voicemacs--enable-sync-minor-modes ()
-  "Enable synchornization of the active minor modes."
-  ;; TODO: Also want to sync change minor modes?
-  (voicemacs--hook-change-buffer 'voicemacs--queue-sync-minor-modes))
-
-
-(defun voicemacs--disable-sync-minor-modes ()
-  "Disable synchornization of the active minor modes."
-  (voicemacs--unhook-change-buffer 'voicemacs--queue-sync-minor-modes))
-
-
-(voicemacs--sync-add 'voicemacs--enable-sync-minor-modes
-                     'voicemacs--disable-sync-minor-modes)
+(voicemacs-define-sync-change-buffer minor-modes
+  :update (voicemacs--active-minor-modes)
+  :defer t)
 
 
 ;; Defined Commands Sync
