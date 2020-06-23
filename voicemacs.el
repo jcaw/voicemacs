@@ -24,26 +24,13 @@
              (get mode 'derived-mode-parent)))))
 
 
-(defun voicemacs--sync-major-mode (&rest _)
-  "Sync the current major mode."
-  (voicemacs--update-if-changed
-   'major-mode-chain
-   (voicemacs--mode-derivation-chain major-mode))
-  (voicemacs--update-if-changed 'primary-major-mode major-mode))
+(voicemacs-define-sync-change-buffer major-mode-chain
+  :update (voicemacs--mode-derivation-chain major-mode)
+  :defer nil)
 
-
-(defun voicemacs--enable-sync-major-mode ()
-  (voicemacs--hook-change-buffer 'voicemacs--sync-major-mode)
-  ;; Sync current state immediately.
-  (voicemacs--sync-major-mode))
-
-
-(defun voicemacs--disable-sync-major-mode ()
-  (voicemacs--unhook-change-buffer 'voicemacs--sync-major-mode))
-
-
-(voicemacs--sync-add 'voicemacs--enable-sync-major-mode
-                     'voicemacs--disable-sync-major-mode)
+(voicemacs-define-sync-change-buffer primary-major-mode
+  :update major-mode
+  :defer nil)
 
 
 ;; Minor Modes Sync
