@@ -128,11 +128,11 @@ the function from ordinary timers."
 
 (defun voicemacs--hash-subset (hash-table keys)
   "Get a subset of a hash table with only the keys in `keys'."
-  (let ((result (make-hash-table)))
-    (mapcar (lambda (key)
-               (puthash key (gethash key hash-table) result))
-             keys)
-    result))
+  (let ((subset (make-hash-table)))
+    (mapc (lambda (key)
+            (puthash key (gethash key hash-table) subset))
+          keys)
+    subset))
 
 
 (defun voicemacs--get-data (key)
