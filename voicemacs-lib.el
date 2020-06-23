@@ -29,5 +29,18 @@ Like `bound-and-true-p', but a function, not a macro."
      result))
 
 
+(defun voicemacs--filter-atoms (func &optional obarray-)
+  "Filter all atoms in `OBARRAY-' with `FUNC'.
+
+Like with `mapatoms', `OBARRAY-' defaults to the value of
+`obarray'."
+  (let ((matches '()))
+    (mapatoms (lambda (atom)
+                (when (funcall func atom)
+                  (push atom matches)))
+              (or obarray- obarray))
+    matches))
+
+
 (provide 'voicemacs-lib)
 ;;; voicemacs-lib.el ends here

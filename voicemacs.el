@@ -57,21 +57,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; TODO: Extract to lib
-(defun voicemacs--mapatoms (func &optional obarray-)
-  (let ((matches '()))
-    (mapatoms (lambda (atom)
-                (when (funcall func atom)
-                  (push atom matches)))
-              (or obarray- obarray))
-    matches))
-
-
 (defun voicemacs--defined-commands ()
   "Get a list of all defined commands."
   ;; TODO: is there a dedicated variable for commands? Don't want to compute
   ;;   unless we have to.
-  (voicemacs--mapatoms 'commandp))
+  (voicemacs--filter-atoms 'commandp))
 
 
 (defun voicemacs--temp-disable-name (func)
