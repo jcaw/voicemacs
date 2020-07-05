@@ -394,6 +394,13 @@ Prefix will be passed to new search."
 (voicemacs-expose-function 'x-focus-frame)
 
 
+(defun voicemacs-find-file (path)
+  "Like `find-file', but returns a JSON-encodable value & has no wildcards."
+  (if (find-file path) t :json-false))
+;; TODO: Don't like exposing `find-file' tbh
+(voicemacs-expose-function 'voicemacs-find-file)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
