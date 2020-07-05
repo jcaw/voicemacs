@@ -39,6 +39,8 @@
   (voicemacs--update-if-changed voicemacs--company-prompt-key :json-null))
 
 
+;; This doesn't use the `it-define-sync' macro because it doesn't use a single
+;; sync func.
 (voicemacs--sync-add 'voicemacs--enable-sync-company-prompt
                      'voicemacs--disable-sync-company-prompt)
 
