@@ -95,7 +95,7 @@ Incompatible with `helm-display-line-numbers-mode'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; TODO: Maybe make a generalised method to invoke nonblocking RPC commands
+;; TODO: Maybe make a generalised function to invoke nonblocking RPC calls
 (defun voicemacs-helm-swoop (query)
   "Run `helm-swoop' with a specific `query' on a timer.
 
