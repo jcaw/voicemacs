@@ -387,6 +387,13 @@ Prefix will be passed to new search."
 (voicemacs-expose-function 'voicemacs-input-pending?)
 
 
+;; Misc Exposed Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(voicemacs-expose-function 'x-focus-frame)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
