@@ -58,8 +58,8 @@
 
 (defun voicemacs-company-pop-doc (number)
   "Show the `company-quickdoc' for a numbered candidate."
-  (voicemacs-company-select-number number)
   (interactive "p")
+  (voicemacs-company-highlight number)
   (company-quickhelp--show))
 
 
@@ -67,10 +67,10 @@
   "Insert a company candidate by `NUMBER'.
 
 Like `company-complete-number', but gives visual feedback."
-  (voicemacs-company-select-number number)
   ;; Sleep outside select-number so it doesn't slow down other selection
   ;; commands (e.g. popping docs is already slow, don't want to increase that).
   (interactive "p")
+  (voicemacs-company-highlight number)
   (sit-for 0.1)
   (company-complete))
 
