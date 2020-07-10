@@ -67,10 +67,9 @@
   "Insert a company candidate by `NUMBER'.
 
 Like `company-complete-number', but gives visual feedback."
-  ;; Sleep outside select-number so it doesn't slow down other selection
-  ;; commands (e.g. popping docs is already slow, don't want to increase that).
   (interactive "p")
   (voicemacs-company-highlight number)
+  ;; Briefly show the candidate being selected for visual feedback
   (sit-for 0.1)
   (company-complete))
 
