@@ -47,7 +47,7 @@
 
 (defun voicemacs-company-highlight (number)
   "Move selection to a numbered company candidate."
-  (interactive "P")
+  (interactive "p")
   (if (called-interactively-p 'any)
       (company-set-selection (+ company-tooltip-offset (- number 1)) t)
     ;; `company-set-selection' has to be called interactively, or the selection
@@ -58,8 +58,8 @@
 
 (defun voicemacs-company-pop-doc (number)
   "Show the `company-quickdoc' for a numbered candidate."
-  (interactive "P")
   (voicemacs-company-select-number number)
+  (interactive "p")
   (company-quickhelp--show))
 
 
@@ -67,10 +67,10 @@
   "Insert a company candidate by `NUMBER'.
 
 Like `company-complete-number', but gives visual feedback."
-  (interactive "P")
   (voicemacs-company-select-number number)
   ;; Sleep outside select-number so it doesn't slow down other selection
   ;; commands (e.g. popping docs is already slow, don't want to increase that).
+  (interactive "p")
   (sit-for 0.1)
   (company-complete))
 
