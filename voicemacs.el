@@ -233,10 +233,8 @@ This function uses a similar method to that used by Flyspell."
                          raw-faces
                        (list raw-faces))))
     (or (member 'font-lock-comment-face faces-list)
-        (member 'font-lock-comment-delimiter-face faces-list)))
-  ;; TODO: Fall back to the standard method if not?
-  ;; (nth 4 (syntax-ppss))
-  )
+        (member 'font-lock-comment-delimiter-face faces-list)
+        (nth 4 (syntax-ppss)))))
 
 
 ;; TODO: Maybe also sync `in-string-p'?
