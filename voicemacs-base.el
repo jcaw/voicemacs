@@ -250,9 +250,49 @@ before calling `voicemacs--sync-add'."
   (porthole-stop-server voicemacs--server-name))
 
 
+(defun voicemacs--running-under-wsl ()
+  "Is this Emacs instance running under Windows Subsystem for Linux?"
+  (let ((uname (shell-command-to-string "uname -a")))
+    (and (string-match-p "Linux" uname)
+         (string-match-p "Microsoft" uname))))
+
+
+(defun voicemacs--copy-wsl-session-to-windows ()
+  "Copy the wsl session file to Windows too.
+
+Note, this will leave a hanging session file on Windows when the
+server is closed."
+  ;; FIXME: No hanging session file.
+  (let ((wsl-path (porthole-get-session-file-path voicemacs--server-name))
+        (windows-path
+         ;; Using the windows %TEMP% dir as the base, get the file path.
+         (f-join
+          ;; Get the host Windows %TEMP% dir, and convert it to a WSL path.
+          (s-trim
+           (shell-command-to-string
+            (concat "wslpath -u \""
+                    (with-output-to-string
+                      (with-current-buffer standard-output
+                        (process-file shell-file-name nil '(t nil) nil shell-command-switch
+                                      "cmd.exe /c echo %TEMP%")))
+                    "\"")))
+          "emacs-porthole/"
+          voicemacs--server-name
+          "session.json")))
+    (when (f-file? windows-path)
+      (f-delete windows-path))
+    (f-mkdir (f-dirname windows-path))
+    (f-copy wsl-path windows-path)))
+
+
 (defun voicemacs--mode-enable ()
   "Post-disable hook for `voicemacs-mode'."
   (porthole-start-server voicemacs--server-name)
+  ;; HACK: If Emacs is running under WSL, we want to be able to communicate with
+  ;;   it from Windows. Copy the session file to the Windows file system.
+  (when (voicemacs--running-under-wsl)
+    (with-demoted-errors "Error duplicating Voicemacs server session file to Windows:"
+      (voicemacs--copy-wsl-session-to-windows)))
   (porthole-expose-functions voicemacs--server-name voicemacs--exposed-functions)
   (voicemacs--sync-setup)
   (voicemacs--set-title))
