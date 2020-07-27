@@ -75,7 +75,6 @@ Like `company-complete-number', but gives visual feedback."
   (company-complete))
 
 
-;; (voicemacs-expose-function 'company-complete-number)
 (voicemacs-expose-function 'voicemacs-company-highlight)
 (voicemacs-expose-function 'voicemacs-company-complete)
 (voicemacs-expose-function 'voicemacs-company-pop-doc)
