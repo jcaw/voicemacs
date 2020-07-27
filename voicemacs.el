@@ -385,6 +385,96 @@ Prefix will be passed to new search."
 (voicemacs-expose-function 'voicemacs-input-pending?)
 
 
+(defmacro voicemacs-diff-indentation (&rest body)
+  "Return the change in indentation at point after running `BODY'.
+
+Only the line at point is tracked. The region is ignored."
+  `(let ((indentation-before (current-indentation)))
+     ,@body
+     (- (current-indentation) indentation-before)))
+
+
+(defun voicemacs-relative-indent (&optional amount)
+  "Indent region `AMOUNT' backward from the automatic indentation level.
+
+If region is not active, operates on the line.
+
+This method indents the first line using
+`indent-according-to-mode', then changes the indentation of the
+rest of the block by the same amount. It then moves the block
+back `AMOUNT' number of tab stops."
+  (interactive "P")
+  (setq amount (or amount 0))
+
+  ;; Indent relative
+  (if (use-region-p)
+      ;; Suppress region deactivation
+      (let (deactivate-mark)
+        (save-excursion
+          (let* ((end-marker (copy-marker (region-end)))
+                 (difference (progn
+                               (goto-char (region-beginning))
+                               (deactivate-mark)
+                               (voicemacs-diff-indentation
+                                (indent-according-to-mode)))))
+            (echo (point))
+            (echo end-marker)
+            ;; Skip first line - we already indented it.
+            (forward-line 1)
+            ;; Implementation adapted from `indent.el'
+            (let ((pr (unless (minibufferp)
+                        (make-progress-reporter "Indenting region..." (point) end-marker))))
+              (echo (point))
+              (echo end-marker)
+              (while (< (point) end-marker)
+                (or (and (bolp) (eolp))
+                    (indent-line-to (+ (current-indentation) difference)))
+                (forward-line 1)
+                (and pr (progress-reporter-update pr (point))))
+              (and pr (progress-reporter-done pr)))
+            (activate-mark))))
+    (indent-according-to-mode))
+  ;; Now reduce indentation from relative point
+  (voicemacs-indent-rigidly-left amount)
+  )
+
+
+(defun voicemacs-indent-rigidly-right (&optional times)
+  "Indent right to the nearest tab stop(s)."
+  (interactive "P")
+  ;; Suppress region deactivation
+  (let (deactivate-mark)
+    (dotimes (i (or times 1))
+      (if (use-region-p)
+          (progn
+            (indent-rigidly-right-to-tab-stop (save-excursion
+                                                (goto-char (region-beginning))
+                                                (deactivate-mark)
+                                                (point-at-bol))
+                                              (region-end))
+            (activate-mark))
+        (indent-rigidly-right-to-tab-stop (point-at-bol)
+                                          (point-at-eol))))))
+
+
+(defun voicemacs-indent-rigidly-left (&optional times)
+  "Indent right to the nearest tab stop(s)."
+  (interactive "P")
+  ;; Suppress region deactivation
+  (let (deactivate-mark)
+    (dotimes (i (or times 1))
+      (if (use-region-p)
+          (progn
+            (indent-rigidly-left-to-tab-stop (save-excursion
+                                               (goto-char (region-beginning))
+                                               (deactivate-mark)
+                                               (point-at-bol))
+                                             (region-end))
+            (activate-mark))
+        (indent-rigidly-left-to-tab-stop (point-at-bol)
+                                         (point-at-eol))))))
+
+
 ;; Misc Exposed Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
