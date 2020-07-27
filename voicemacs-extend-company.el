@@ -50,9 +50,10 @@
   (interactive "p")
   (if (called-interactively-p 'any)
       (company-set-selection (+ company-tooltip-offset (- number 1)) t)
-    ;; `company-set-selection' has to be called interactively, or the selection
-    ;; won't show visually.
+    ;; HACK: `company-set-selection' has to be called interactively, or the
+    ;; selection won't show visually.
     (let ((current-prefix-arg number))
+      ;; FIXME: This trick no longer works everywhere.
       (call-interactively 'voicemacs-company-highlight))))
 
 
