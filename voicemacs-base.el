@@ -407,7 +407,8 @@ source."
             (sync-action (if -defer deferred-sync-func immediate-sync-func)))
        ;; Tear down the previous version of the sync, if necessary
        (when (and voicemacs-mode (fboundp disable-sync-func))
-         (funcall disable-sync-func))
+         (with-demoted-errors "Error reversing previous Voicemacs sync:\n%s"
+           (funcall disable-sync-func)))
 
        ;; Define function to sync immediately
        (eval `(defun ,immediate-sync-func (&rest _)
