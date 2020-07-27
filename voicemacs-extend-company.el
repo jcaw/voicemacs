@@ -70,7 +70,7 @@
 Like `company-complete-number', but gives visual feedback."
   (interactive "p")
   (voicemacs-company-highlight number)
-  ;; Briefly show the candidate being selected for visual feedback
+  ;; Briefly hold with the candidate highlighted for visual feedback
   (sit-for 0.1)
   (company-complete))
 
