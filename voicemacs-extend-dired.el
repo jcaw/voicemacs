@@ -115,14 +115,32 @@ buffers."
          (buffer-list)))
 
 
+(defun voicemacs--dired-renumber-buffer (buffer)
+  "Insert numbers into a specific `BUFFER'."
+  (when (bufferp buffer)
+    (with-current-buffer buffer
+      (voicemacs--dired-insert-numbers))))
+
+
+(defun voicemacs--dired-queue-renumber ()
+  "Queue a renumbering of the current buffer.
+
+Defer to avoid duplicating work, and for compatibility with
+certain dired rendering schemes (e.g. Doom Emacs hides \".\" &
+\"..\" after candidates are inserted, but that won't remove their
+number overlays)."
+  (voicemacs--queue-once 'voicemacs--dired-renumber-buffer
+                         :args (list (current-buffer))))
+
+
 (defun voicemacs--dired-numbers-mode-setup ()
-  (advice-add 'dired-insert-set-properties :after 'voicemacs--dired-insert-numbers)
+  (add-hook 'dired-after-readin-hook 'voicemacs--dired-queue-renumber)
   (voicemacs--dired-mapc
    (voicemacs--dired-insert-numbers)))
 
 
 (defun voicemacs--dired-numbers-mode-teardown ()
-  (advice-remove 'dired-insert-set-properties 'voicemacs--dired-insert-numbers)
+  (remove-hook 'dired-after-readin-hook 'voicemacs--dired-queue-renumber)
   (voicemacs--dired-mapc
    (voicemacs--dired-remove-overlays)))
 
