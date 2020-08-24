@@ -181,8 +181,10 @@
          (voicemacs2--make-response nonce "authentication-successful" nil))
      (voicemacs2--make-error nonce "invalid-credentials"
                              "The credentials supplied were invalid.")))
-  ;; TODO: sync all keys
-  )
+  ;; TODO: Better method for initial sync?
+  (maphash (lambda (key value)
+             (voicemacs2--send-update client key value))
+           voicemacs--data))
 
 
 (defun voicemacs--authenticated? (client)
@@ -244,7 +246,8 @@ constructed with this method."
         ;; TODO: Handle malformed data
         ;;
         ;; Just use dummy exposed functions for now
-        ,(json-rpc-server-handle (gethash "call" data) '(message))))))))
+        ,(json-rpc-server-handle (gethash "call" data)
+                                 voicemacs--exposed-functions)))))))
 
 
 (defun voicemacs2--send (client message)

@@ -1,5 +1,6 @@
 (require 'json)
 (require 'porthole)
+(require 'voicemacs-server)
 
 
 (defgroup voicemacs nil
@@ -42,7 +43,7 @@ direct connection.")
   "The title format before `voicemacs-mode' was enabled.")
 
 
-(defvar voicemacs--data (make-hash-table)
+(defvar voicemacs--data (make-hash-table :test 'equal)
   "Data that should be mirrored to clients.")
 
 
@@ -58,6 +59,7 @@ value. This list holds these keys.")
   (unless (member func voicemacs--exposed-functions)
     (push func voicemacs--exposed-functions)
     (when (and voicemacs-mode (porthole-server-running-p voicemacs--server-name))
+      ;; TODO: Switch this to custom persistent socket
       (porthole-expose-function voicemacs--server-name func))))
 
 
@@ -111,6 +113,11 @@ the function from ordinary timers."
   ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
   ;;   at a lower level?
   (push key voicemacs--unsynced-keys)
+  ;; TODO: Probably outright remove the porthole server, replace with just
+  ;;   persistent socket.
+  ;;
+  ;; TODO: Fix circular imports
+  (voicemacs2--broadcast-update key value)
   ;; Emacs might be busy for a while yet. If we tell the user data is available
   ;; now, they may not be able to pull it. Do it on a timer so it's flagged when
   ;; the user is more likely to be able to pull it.
@@ -247,6 +254,7 @@ before calling `voicemacs--sync-add'."
   "Post-enable hook for `voicemacs-mode'."
   (voicemacs--restore-title)
   (voicemacs--sync-teardown)
+  (voicemacs2--stop-server)
   (porthole-stop-server voicemacs--server-name))
 
 
@@ -295,7 +303,8 @@ server is closed."
       (voicemacs--copy-wsl-session-to-windows)))
   (porthole-expose-functions voicemacs--server-name voicemacs--exposed-functions)
   (voicemacs--sync-setup)
-  (voicemacs--set-title))
+  (voicemacs--set-title)
+  (voicemacs2--start-server))
 
 
 (defun voicemacs--format-symbol (string-spec &rest args)
