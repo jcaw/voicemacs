@@ -302,7 +302,7 @@ parameters."
 
 
 (define-minor-mode voicemacs-mode
-  "Minor mode to communicate with voice recognition software."
+  "Minor mode to allow voice recognition software to communicate with Emacs."
   :group 'voicemacs
   :global t
   :lighter nil
