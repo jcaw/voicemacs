@@ -1,4 +1,5 @@
 (require 'cl-lib)
+(require 'json-rpc-server)
 
 
 (defvar voicemacs2--update-response-timeout 3
