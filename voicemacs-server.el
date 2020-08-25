@@ -254,9 +254,11 @@ constructed with this method."
    client
    ;; Guard the start too in case of hanging messages in the pipeline.
    (concat "\0"
-           ;; TODO: Use Emacs 27's method if possible.
-           (json-encode message)
-           ;; (json-serialize message :null-object nil)
+           ;; HACK: Leverage private method of `json-rpc-server' because it
+           ;;   emulates the behaviour of `json-encode' while exploiting the
+           ;;   performance increase of Emacs 27's `json-serialize' (when
+           ;;   possible).
+           (json-rpc-server--emulate-legacy-encode message)
            "\0")))
 
 

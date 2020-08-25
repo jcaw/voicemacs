@@ -39,8 +39,10 @@ the function from ordinary timers."
   (or (equal item-1 item-2)
       ;; Check JSON forms so we can tolerate hash maps.
       ;;
-      ;; TODO: Use a more robust checking system here, JSON isn't great.
-      (string= (json-encode item-1) (json-encode item-2))))
+      ;; HACK: JSON comparison as a standin for in-depth compare function.
+      ;;   Replace this at some point.
+      (string= (json-rpc-server--emulate-legacy-encode item-1)
+               (json-rpc-server--emulate-legacy-encode item-2))))
 
 
 (defun voicemacs-update-data (key value)
