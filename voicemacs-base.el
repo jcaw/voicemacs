@@ -16,7 +16,7 @@
 
 
 (defun voicemacs-expose-function (func)
-  "Expose `func' over the RPC server when in `voicemacs-mode'."
+  "Expose `FUNC' over the RPC server (when in `voicemacs-mode')."
   (unless (member func voicemacs--exposed-functions)
     (push func voicemacs--exposed-functions)))
 
