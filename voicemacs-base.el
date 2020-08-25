@@ -1,5 +1,4 @@
 (require 'json)
-(require 'porthole)
 (require 'voicemacs-server)
 
 
@@ -8,59 +7,18 @@
   :prefix "voicemacs-")
 
 
-(defconst voicemacs--server-name "voicemacs"
-  "Name of the porthole server for voicemacs.
-
-Clients should use this server for voicemacs-related RPC. Easiest
-way to do that is with the Porthole Python Client.")
-
-
 (defvar voicemacs--exposed-functions '()
   "Functions that should be exposed by voicemacs.")
-
-
-(defvar voicemacs--title-data ""
-  "JSON-formatted string containing data that is appended to the title.
-
-Used to communicate information to external engines without a
-direct connection.")
-
-
-(defconst voicemacs--title-suffix
-  '(:eval (concat
-           ;; Delineate voicemacs data with a semicolon.
-           "; "
-           ;; This prefix doubles as an indicator that voicemacs is active.
-           "voicemacs: "
-           voicemacs--title-data
-           ;; Tail with this to defend against something being added to the end
-           ;; of the title.
-           "; "))
-  "The title format used by voicemacs.")
-
-
-(defvar voicemacs--old-title-format nil
-  "The title format before `voicemacs-mode' was enabled.")
 
 
 (defvar voicemacs--data (make-hash-table :test 'equal)
   "Data that should be mirrored to clients.")
 
 
-(defvar voicemacs--unsynced-keys nil
-  "List of keys that have not yet been synced with the client.
-
-When a key is updated, the client needs to manually grab the new
-value. This list holds these keys.")
-
-
 (defun voicemacs-expose-function (func)
   "Expose `func' over the RPC server when in `voicemacs-mode'."
   (unless (member func voicemacs--exposed-functions)
-    (push func voicemacs--exposed-functions)
-    (when (and voicemacs-mode (porthole-server-running-p voicemacs--server-name))
-      ;; TODO: Switch this to custom persistent socket
-      (porthole-expose-function voicemacs--server-name func))))
+    (push func voicemacs--exposed-functions)))
 
 
 ;; TODO: `voicemacs-remove-function'
@@ -85,46 +43,11 @@ the function from ordinary timers."
       (string= (json-encode item-1) (json-encode item-2))))
 
 
-(defun voicemacs--assert-no-semicolons (string)
-  "Raise an error if `string' contains semicolons. Returns `string'."
-  (mapcar (lambda (char)
-            (when (= char ?\;)
-              (error "String contains semicolon(s): \"%s\"" string)))
-          string)
-  string)
-
-
-(defun voicemacs--sync-title ()
-  "Make the title data reflect the internal voicemacs data."
-  (setq voicemacs--title-data
-        ;; Semicolons are used to separate the data section in the title - we
-        ;; can't include them in the title's data.
-        ;;
-        ;; The point of raising an error here is to make the limitation very
-        ;; overt. This error should never be raised in production, since it will
-        ;; cause the entire sync mechanism to grind to a halt.
-        (voicemacs--assert-no-semicolons
-         (json-encode `(("data" . ,(if voicemacs--unsynced-keys t :json-false)))))))
-
-
 (defun voicemacs-update-data (key value)
-  "Update data `key' to be `value', and flag it to the user."
+  "Update data `key' to be `value', and send the new value to the client."
   (puthash key value voicemacs--data)
-  ;; TODO: What to do if we're pushing unnecessary data? Still flag it? Handle
-  ;;   at a lower level?
-  (push key voicemacs--unsynced-keys)
-  ;; TODO: Probably outright remove the porthole server, replace with just
-  ;;   persistent socket.
-  ;;
   ;; TODO: Fix circular imports
-  (voicemacs2--broadcast-update key value)
-  ;; Emacs might be busy for a while yet. If we tell the user data is available
-  ;; now, they may not be able to pull it. Do it on a timer so it's flagged when
-  ;; the user is more likely to be able to pull it.
-  ;;
-  ;; Would use an idle timer for this, but then the title wouldn't update in
-  ;; e.g. the `helm-M-x' prompt.
-  (run-with-timer 0 nil 'voicemacs--sync-title))
+  (voicemacs2--broadcast-update key value))
 
 
 (defun voicemacs--update-if-changed (key value)
@@ -145,64 +68,6 @@ the function from ordinary timers."
 (defun voicemacs--get-data (key)
   "Get the current value of `key' in `voicemacs--data'."
   (gethash key voicemacs--data))
-
-
-(defun voicemacs-pull-data (&optional full)
-  "Get (and reset) pending changes to the data.
-
-If `full' is t, gets all data, not just the changes."
-  ;; TODO: Optimize this so we check whether the data is actually worth
-  ;;   transferring? Compare against a shadow state?
-  (voicemacs--first-result (if full
-                              voicemacs--data
-                            (voicemacs--hash-subset voicemacs--data
-                                                    voicemacs--unsynced-keys))
-    (setq voicemacs--unsynced-keys '())
-    (voicemacs--sync-title)
-    ;; FIX: When helm prompts are open, pulling doesn't update the title.
-    ;; Seems to be a weird race condition - redrawing the modeling fixes it.
-    ;;
-    ;; To be safe, apply this fix whenever we're in the minibuffer.
-    (when (eq major-mode 'minibuffer-inactive-mode)
-      ;; TODO: Check whether this bug only occurs on Windows.
-      (redraw-modeline))))
-
-
-(defun voicemacs--reset-data ()
-  "Reset synchronization data to vanilla values."
-  (setq voicemacs--unsynced-keys '())
-  (setq voicemacs--data (make-hash-table))
-  (voicemacs--sync-title))
-
-
-(defun voicemacs--voicemacs-title-p ()
-  "Is the title currently in voicemacs format?"
-  (let ((default-title (default-value 'frame-title-format)))
-    (and (listp default-title)
-         ;; TODO: Should this have to be the last element?
-         (member voicemacs--title-suffix default-title)
-         ;; Cast to bool
-         t)))
-
-
-(defun voicemacs--set-title ()
-  "Set the title to the voicemacs format."
-  (unless (voicemacs--voicemacs-title-p)
-    (setq voicemacs--old-title-format (default-value 'frame-title-format))
-    (setq-default frame-title-format (list frame-title-format
-                                           voicemacs--title-suffix))
-    (voicemacs--sync-title)))
-
-
-(defun voicemacs--restore-title ()
-  "Restore the original title format.
-
-Note this will only revert a voicemacs-formatted title. If thet
-title format has been modified since, this method will leave the
-new format."
-  (when voicemacs--old-title-format
-    (setq-default frame-title-format voicemacs--old-title-format)
-    (setq voicemacs--old-title-format nil)))
 
 
 (defvar voicemacs--sync-setup-hook '()
@@ -237,25 +102,15 @@ before calling `voicemacs--sync-add'."
   (add-hook 'voicemacs--sync-teardown-hook teardown))
 
 
-(defun voicemacs--sync-setup ()
-  "Perform necessary setup to enable data synchronization."
-  (voicemacs--reset-data)
-  (run-hooks 'voicemacs--sync-setup-hook))
-
-
-(defun voicemacs--sync-teardown ()
-  "Tear down data synchronization (reverses `voicemacs--sync-setup')."
-  (run-hooks 'voicemacs--sync-teardown-hook)
-  ;; Defensive; probably not necessary
-  (voicemacs--reset-data))
-
-
 (defun voicemacs--mode-disable ()
   "Post-enable hook for `voicemacs-mode'."
-  (voicemacs--restore-title)
-  (voicemacs--sync-teardown)
-  (voicemacs2--stop-server)
-  (porthole-stop-server voicemacs--server-name))
+  ;; Disable syncing
+  (run-hooks 'voicemacs--sync-teardown-hook)
+  ;; Defensive, also free the memory
+  (clrhash voicemacs--data)
+
+  ;; Now stop the server.
+  (voicemacs2--stop-server))
 
 
 (defun voicemacs--running-under-wsl ()
@@ -265,46 +120,17 @@ before calling `voicemacs--sync-add'."
          (string-match-p "Microsoft" uname))))
 
 
-(defun voicemacs--copy-wsl-session-to-windows ()
-  "Copy the wsl session file to Windows too.
-
-Note, this will leave a hanging session file on Windows when the
-server is closed."
-  ;; FIXME: No hanging session file.
-  (let ((wsl-path (porthole-get-session-file-path voicemacs--server-name))
-        (windows-path
-         ;; Using the windows %TEMP% dir as the base, get the file path.
-         (f-join
-          ;; Get the host Windows %TEMP% dir, and convert it to a WSL path.
-          (s-trim
-           (shell-command-to-string
-            (concat "wslpath -u \""
-                    (with-output-to-string
-                      (with-current-buffer standard-output
-                        (process-file shell-file-name nil '(t nil) nil shell-command-switch
-                                      "cmd.exe /c echo %TEMP%")))
-                    "\"")))
-          "emacs-porthole/"
-          voicemacs--server-name
-          "session.json")))
-    (when (f-file? windows-path)
-      (f-delete windows-path))
-    (f-mkdir (f-dirname windows-path))
-    (f-copy wsl-path windows-path)))
-
-
 (defun voicemacs--mode-enable ()
   "Post-disable hook for `voicemacs-mode'."
-  (porthole-start-server voicemacs--server-name)
-  ;; HACK: If Emacs is running under WSL, we want to be able to communicate with
-  ;;   it from Windows. Copy the session file to the Windows file system.
-  (when (voicemacs--running-under-wsl)
-    (with-demoted-errors "Error duplicating Voicemacs server session file to Windows:"
-      (voicemacs--copy-wsl-session-to-windows)))
-  (porthole-expose-functions voicemacs--server-name voicemacs--exposed-functions)
-  (voicemacs--sync-setup)
-  (voicemacs--set-title)
-  (voicemacs2--start-server))
+  ;; Start server
+  (voicemacs2--start-server)
+
+  ;; Setup sync
+  (clrhash voicemacs--data)
+  (run-hooks 'voicemacs--sync-setup-hook)
+
+  ;; TODO: Maybe put a signifier that voicemacs is active in the title?
+  )
 
 
 (defun voicemacs--format-symbol (string-spec &rest args)
@@ -505,9 +331,6 @@ functions."
   (remove-hook 'after-change-major-mode-hook func)
   (remove-hook 'post-command-hook func)
   (cancel-function-timers func))
-
-
-(voicemacs-expose-function 'voicemacs-pull-data)
 
 
 (provide 'voicemacs-base)

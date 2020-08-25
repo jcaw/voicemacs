@@ -321,8 +321,5 @@ is already connected, the new client will be rejected."
     (setq voicemacs2--connected-clients nil)))
 
 
-;; TODO: exposed functions
-
-
 (provide 'voicemacs-server)
 ;;; voicemacs-server.el ends here
