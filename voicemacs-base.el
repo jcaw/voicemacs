@@ -21,7 +21,10 @@
     (push func voicemacs--exposed-functions)))
 
 
-;; TODO: `voicemacs-remove-function'
+(defun voicemacs-remove-function (func)
+  "Remove a function exposed with `voicemacs-expose-function'."
+  (setq voicemacs--exposed-functions
+        (remove func voicemacs--exposed-functions)))
 
 
 (cl-defun voicemacs--queue-once (func &key (args '()) (time 0))
