@@ -245,8 +245,6 @@ constructed with this method."
     (voicemacs2--make-hash-table
      `(("json-result" .
         ;; TODO: Handle malformed data
-        ;;
-        ;; Just use dummy exposed functions for now
         ,(json-rpc-server-handle (gethash "call" data)
                                  voicemacs--exposed-functions)))))))
 
