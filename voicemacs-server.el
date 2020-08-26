@@ -22,6 +22,14 @@
   "List of currently connected clients.")
 
 
+(defvar voicemacs--current-auth-key nil
+  "Auth key clients must provide when they connect.")
+
+
+(defvar voicemacs--current-port nil
+  "Port that the server is running on.")
+
+
 (defun voicemacs--broadcast-update (key new-value)
   (declare (indent 1))
   (mapc (lambda (client)
@@ -178,7 +186,9 @@
   (voicemacs--send
    client
    ;; For now, always authenticate
-   (if (gethash "key" data)
+   (if (and voicemacs--current-auth-key  ; Protect against an error in the key.
+            (equal (gethash "key" data)
+                   voicemacs--current-auth-key))
        (progn
          (process-put client :authenticated t)
          (voicemacs--make-response nonce "authentication-successful" nil))
@@ -291,7 +301,84 @@ is already connected, the new client will be rejected."
   (push client voicemacs--connected-clients))
 
 
-(defun voicemacs--start-server (&optional port plist)
+(defun voicemacs--get-linux-temp-dir ()
+  "Get a user-only temp dir on Linux, to store the server info in."
+  ;; If the runtime dir isn't available, fall back to the home dir.
+  (or (getenv "XDG_RUNTIME_DIR")
+      (and (getenv "HOME")
+           (f-join (getenv "HOME") "tmp"))
+      (and (display-warning
+            "voicemacs"
+            (concat "Neither $XDG_RUNTIME_DIR nor $HOME could be read from "
+                    "the environment. Cannot create session file - clients "
+                    "will not be able to connect automatically."))
+           nil)))
+
+
+(defconst voicemacs--base-temp-dir
+  (pcase system-type
+    ('gnu/linux (voicemacs--get-linux-temp-dir))
+    ('windows-nt (getenv "TEMP"))
+    ('darwin (substitute-in-file-name "$HOME/Library/"))
+    (_
+     ;; Use the same method as Linux on unknown systems.
+     (display-warning
+      "voicemacs"
+      (concat "Unrecognised system type. Don't know where to find the "
+              "temp directory. Using the same method as Linux."))
+     (porthole--get-linux-temp-dir)))
+  "The base temp directory to use.
+
+This will be dependent on the current system.")
+
+
+(defconst voicemacs--session-file-name
+  (f-join voicemacs--base-temp-dir "voicemacs" "session.json"))
+
+
+(defun voicemacs--publish-session-file (port auth-key)
+  "Publish the current session's connection information.
+
+Clients can use this file to automatically connect."
+  ;; Clean up old session first
+  (when (f-file? voicemacs--session-file-name)
+    (f-delete voicemacs--session-file-name))
+
+  (let ((directory (f-dirname voicemacs--session-file-name)))
+    (unless (f-dir? directory)
+      (make-directory directory t)))
+  (with-temp-file voicemacs--session-file-name
+    (insert (json-rpc-server--emulate-legacy-encode
+             (voicemacs--make-hash-table
+              `(("port" . ,port)
+                ("auth-key" . ,auth-key))))))
+  voicemacs--session-file-name)
+
+
+(defun voicemacs--erase-session-file ()
+  "Delete the active session file (and directory).
+
+Will not raise an error if the file doesn't exist."
+  (when (f-file? voicemacs--session-file-name)
+    (f-delete voicemacs--session-file-name))
+  (let ((directory (f-dirname voicemacs--session-file-name)))
+    (when (f-dir? directory)
+      (f-delete directory t))))
+
+
+(defun voicemacs--random-sha256-key ()
+  "Generate a random sha256 key."
+  ;; Make 400 random int strings, join them, then hash the result. That should
+  ;; be suitably unique.
+  ;;
+  ;; TODO: Introduce some kind of external entropy? Command history?
+  (let ((long-random-number
+         (apply #'concat (mapcar (lambda (_)
+                                   (format "%s" (random 9999999999999)))
+                                 (number-sequence 0 400)))))
+    (secure-hash 'sha256 long-random-number)))
+
+
   "Start a new Voicemacs server process."
   (when voicemacs--server-process
     ;; TODO: Ensure server is also running?
@@ -303,8 +390,8 @@ is already connected, the new client will be rejected."
         (make-network-process :name voicemacs--server-name
                               :buffer voicemacs--server-buffer-name
                               :family 'ipv4
-                              ;; TODO: Remove placeholder port
-                              :service (or port 5001)
+                              ;; TODO: Explicit address?
+                              :service (or port t)
                               :sentinel 'voicemacs--server-sentinel
                               :filter 'voicemacs--server-filter
                               :log 'voicemacs--server-new-client
@@ -312,16 +399,42 @@ is already connected, the new client will be rejected."
                               :server t
                               :noquery t
                               :plist plist))
-  ;; TODO: Publish port & auth key
-  )
+
+  (setq voicemacs--current-auth-key (voicemacs--random-sha256-key))
+  (setq voicemacs--current-port
+        ;; Have to manually extract the actual assigned port from the process.
+        (process-contact voicemacs--server-process :service))
+
+  (voicemacs--publish-session-file
+   voicemacs--current-port
+   voicemacs--current-auth-key))
 
 
 (defun voicemacs--stop-server ()
   "Stop the Voicemacs server."
   (when voicemacs--server-process
-    (delete-process voicemacs--server-process)
-    (setq voicemacs--server-process nil)
-    (setq voicemacs--connected-clients nil)))
+    (voicemacs--erase-session-file)
+    (ignore-errors
+      (delete-process voicemacs--server-process))
+    (setq voicemacs--current-auth-key nil
+          voicemacs--current-port nil
+          voicemacs--server-process nil
+          voicemacs--connected-clients nil)))
+
+
+(defun voicemacs--stop-server-safe ()
+  "Stop the Voicemacs server, but suppress all errors.
+
+Safe to hook to things like `kill-emacs-hook'."
+  (ignore-errors (voicemacs--stop-server)))
+
+
+;; In particular we want to clean up lingering session files.
+(add-hook 'kill-emacs-hook #'voicemacs--stop-server-safe)
+(unless voicemacs--server-process
+  ;; If Emacs crashes, the session file will linger. Try and help this a little
+  ;; - clean up lingering sessions when Voicemacs is loaded.
+  (voicemacs--erase-session-file))
 
 
 (provide 'voicemacs-server)
