@@ -52,7 +52,7 @@ the function from ordinary timers."
   "Update data `key' to be `value', and send the new value to the client."
   (puthash key value voicemacs--data)
   ;; TODO: Fix circular imports
-  (voicemacs2--broadcast-update key value))
+  (voicemacs--broadcast-update key value))
 
 
 (defun voicemacs--update-if-changed (key value)
@@ -115,7 +115,7 @@ before calling `voicemacs--sync-add'."
   (clrhash voicemacs--data)
 
   ;; Now stop the server.
-  (voicemacs2--stop-server))
+  (voicemacs--stop-server))
 
 
 (defun voicemacs--running-under-wsl ()
@@ -128,7 +128,7 @@ before calling `voicemacs--sync-add'."
 (defun voicemacs--mode-enable ()
   "Post-disable hook for `voicemacs-mode'."
   ;; Start server
-  (voicemacs2--start-server)
+  (voicemacs--start-server)
 
   ;; Setup sync
   (clrhash voicemacs--data)
