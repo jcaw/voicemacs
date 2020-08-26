@@ -23,12 +23,14 @@
 
 
 (defun voicemacs--broadcast-update (key new-value)
+  (declare (indent 1))
   (mapc (lambda (client)
           (voicemacs--send-update client key new-value))
         voicemacs--connected-clients))
 
 
 (defun voicemacs--send-update (client key new-value)
+  (declare (indent 1))
   ;; TODO 1: Need to be able to handle the client just failing here.
   (when (voicemacs--authenticated? client)
     (let ((nonce (process-get client :outgoing-nonce)))
