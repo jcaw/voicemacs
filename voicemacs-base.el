@@ -140,6 +140,7 @@ before calling `voicemacs--sync-add'."
   "Post-disable hook for `voicemacs-mode'."
   ;; Start server
   (voicemacs--start-server)
+  (message "Voicemacs server started")
   ;; HACK: Some packages kill the server erroneously, e.g. `persp-mode' when it
   ;;   restores the previous perspective. Don't try and play whack-a-mole with
   ;;   them, just poll & restart.
