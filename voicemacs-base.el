@@ -109,13 +109,24 @@ before calling `voicemacs--sync-add'."
 
 (defun voicemacs--mode-disable ()
   "Post-enable hook for `voicemacs-mode'."
+  (cancel-function-timers 'voicemacs--maybe-restart-server)
+
   ;; Disable syncing
   (run-hooks 'voicemacs--sync-teardown-hook)
   ;; Defensive, also free the memory
   (clrhash voicemacs--data)
 
   ;; Now stop the server.
-  (voicemacs--stop-server))
+  (voicemacs--stop-server)
+  )
+
+
+(defun voicemacs--maybe-restart-server ()
+  "If the server is dead (and it shouldn't be), restart it."
+  (when (and voicemacs-mode
+             (not voicemacs--server-process))
+    (message "Voicemacs server has been killed erroneously. Restarting it.")
+    (voicemacs--start-server)))
 
 
 (defun voicemacs--running-under-wsl ()
@@ -129,6 +140,10 @@ before calling `voicemacs--sync-add'."
   "Post-disable hook for `voicemacs-mode'."
   ;; Start server
   (voicemacs--start-server)
+  ;; HACK: Some packages kill the server erroneously, e.g. `persp-mode' when it
+  ;;   restores the previous perspective. Don't try and play whack-a-mole with
+  ;;   them, just poll & restart.
+  (run-with-idle-timer 0.01 0 'voicemacs--maybe-restart-server)
 
   ;; Setup sync
   (clrhash voicemacs--data)
