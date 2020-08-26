@@ -386,7 +386,8 @@ Will not raise an error if the file doesn't exist."
   (when voicemacs--server-process
     ;; TODO: Ensure server is also running?
     (error "The Voicemacs server is already running."))
-  
+
+  ;; TODO: Attach this to the server process?
   (setq voicemacs--connected-clients nil)
   (setq voicemacs--server-process
         ;; TODO: Include port number in server/buffer name?
