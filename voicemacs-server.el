@@ -379,6 +379,7 @@ Will not raise an error if the file doesn't exist."
     (secure-hash 'sha256 long-random-number)))
 
 
+(cl-defun voicemacs--start-server (&key port plist)
   "Start a new Voicemacs server process."
   (when voicemacs--server-process
     ;; TODO: Ensure server is also running?
