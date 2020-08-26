@@ -262,6 +262,8 @@ constructed with this method."
 
 
 (defun voicemacs--send (client message)
+  ;; TODO: Temporarily raise garbage collection threshold to stop GCs during
+  ;;   this process?
   (process-send-string
    client
    ;; Guard the start too in case of hanging messages in the pipeline.
