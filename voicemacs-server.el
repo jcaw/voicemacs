@@ -37,10 +37,10 @@
       (voicemacs--send
        client
        (voicemacs--make-request "update"
-                                 nonce
-                                 (voicemacs--make-hash-table
-                                  `(("key" . ,key)
-                                    ("value" . ,new-value)))))
+                                nonce
+                                (voicemacs--make-hash-table
+                                 `(("key" . ,key)
+                                   ("value" . ,new-value)))))
       (puthash (format "%s" key) nonce
                (process-get client :pending-responses))
       ;; TODO: What if we're busy when we recieve the response? Will it process
@@ -183,7 +183,7 @@
          (process-put client :authenticated t)
          (voicemacs--make-response nonce "authentication-successful" nil))
      (voicemacs--make-error nonce "invalid-credentials"
-                             "The credentials supplied were invalid.")))
+                            "The credentials supplied were invalid.")))
   ;; TODO: Better method for initial sync?
   (maphash (lambda (key value)
              (voicemacs--send-update client key value))
