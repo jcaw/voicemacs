@@ -293,6 +293,8 @@ Returns a list, each item is the visible text for one window."
 (add-hook 'after-init-hook 'voicemacs--check-distribution)
 ;; Check now in case the hook has been run.
 (voicemacs--check-distribution)
+;; Janky on Doom, just re-run it after startup.
+(run-with-idle-timer 1 nil 'voicemacs--check-distribution)
 
 
 ;; Misc Commands
