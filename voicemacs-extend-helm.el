@@ -48,19 +48,26 @@ infinite loops on a recursive call."
                              face-remapping-alist))))
 
 
+(defun voicemacs--enable-selection-line-numbers (&rest _)
+  "Make the current buffer show bold, absolute line numbers.
+
+These numbers can be used for selection."
+  ;; Default line numbers are subtle. These are selection numbers, make them
+  ;; stand out.
+  ;;
+  ;; TODO: Extract line numbers face?
+  (voicemacs--local-override-face 'line-number 'bold 'font-lock-keyword-face)
+  (voicemacs--local-override-face 'line-number-current-line
+                                  'bold
+                                  'helm-selection
+                                  'font-lock-keyword-face)
+  (setq-local display-line-numbers 'absolute))
+
+
 (defun voicemacs--show-helm-numbers ()
   (when helm-alive-p
     (with-helm-buffer
-      ;; Default line numbers are subtle. These are selection numbers, make them
-      ;; stand out.
-      ;;
-      ;; TODO: Extract line numbers face?
-      (voicemacs--local-override-face 'line-number 'bold 'font-lock-keyword-face)
-      (voicemacs--local-override-face 'line-number-current-line
-                                      'bold
-                                      'helm-selection
-                                      'font-lock-keyword-face)
-      (setq-local display-line-numbers 'absolute))))
+      (voicemacs--enable-selection-line-numbers))))
 
 
 (defun voicemacs--helm-numbers-mode-setup ()
