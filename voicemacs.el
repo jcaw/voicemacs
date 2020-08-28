@@ -252,6 +252,28 @@ This function uses a similar method to that used by Flyspell."
  :defer nil)
 
 
+;; Text on Screen
+;;;;;;;;;;;;;;;;;
+
+
+(defun voicemacs--visible-text ()
+  "Get all visible text in each window.
+
+Returns a list, each item is the visible text for one window."
+  (mapcar (lambda (window)
+            (with-selected-window window
+              (buffer-substring-no-properties (window-start) (window-end))))
+          ;; All windows
+          (cl-mapcan #'window-list (frame-list))))
+
+
+(voicemacs-define-sync visible-text
+  :update (voicemacs--visible-text)
+  :enable (run-with-idle-timer 0.05 0 sync-func)
+  :disable (cancel-function-timers sync-func)
+  :defer nil)
+
+
 ;; Emacs Metadata
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
