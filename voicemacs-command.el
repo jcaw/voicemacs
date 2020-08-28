@@ -89,6 +89,49 @@ Arguments:
   (cons signal-type data))
 
 
+(defun voicemacs--multiple-cursors-manual-injection (emulated-command)
+  "Hack to trick `multiple-cursors-mode' into running an emulated command.
+
+Without this `multiple-cursors-mode' will fall over when applying
+our command to secondary cursors, because it tries to repeat
+`voicemacs--command-event-handler', not the command we're
+emulating. This happens because it stores the original command
+during the `pre-command-hook', which is run automatically by the
+signal handler.
+
+To get around this we ignore `voicemacs--command-event-handler'
+and manually make it store the command we're emulating. The
+normal `post-command-hook' will then trigger that instead. Hairy
+hack, but it's also precise with any hacks here to avoid
+second-order effects."
+  (when (and (bound-and-true-p multiple-cursors-mode)
+             (functionp 'mc/make-a-note-of-the-command-being-run))
+    (let ((this-original-command emulated-command))
+      (mc/make-a-note-of-the-command-being-run))))
+
+
+;;;###autoload
+(with-eval-after-load 'multiple-cursors-core
+  ;; HACK: Multiple cursors should never try and repeat the command signal -
+  ;;   instead we manually inject the emulated command. To do this we force it
+  ;;   to ignore our signal.
+
+  ;; Note we demote errors so Voicemacs doesn't fall over completely if the
+  ;; patch stops working.
+
+  (defun voicemacs--patch-mc-lists (&rest _)
+    "Remove the command signal from the multiple cursors lists."
+    (with-demoted-errors "`voicemacs' error patching `multiple-cursors': %s"
+      (add-to-list 'mc/cmds-to-run-once 'voicemacs--command-event-handler)
+      ;; In case the user had it stored in the wrong place.
+      (setq mc/cmds-to-run-for-all (remove 'voicemacs--command-event-handler
+                                           mc/cmds-to-run-for-all))))
+  (with-demoted-errors "`voicemacs' error patching `multiple-cursors': %s"
+      (voicemacs--patch-mc-lists)
+      ;; The list file can be lazy-loaded, so re-apply the patch then.
+      (advice-add 'mc/load-lists :after 'voicemacs--patch-mc-lists)))
+
+
 (defun voicemacs--command-event-handler ()
   "Handle a command emulation event.
 
@@ -102,6 +145,10 @@ key)."
          ;; This is an RPC command. The user doesn't need to know the keyboard
          ;; shortcut, it's annoying.
          (suggest-key-bindings nil))
+    ;; HACK: Compatibility with `multiple-cursors-mode'.
+    (voicemacs--multiple-cursors-manual-injection
+     command-name)
+
     ;; Usually this shouldn't be called from Elisp code, but we want Emacs to
     ;; treat this as a normal command as much as possible.
     (execute-extended-command prefix-arg (format "%s" command-name))))
