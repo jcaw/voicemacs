@@ -5,6 +5,9 @@
 (require 'voicemacs-command)
 
 (require 'voicemacs-avy)
+
+(require 'voicemacs-it)
+
 (with-eval-after-load 'helm
   (require 'voicemacs-extend-helm))
 (with-eval-after-load 'dired
