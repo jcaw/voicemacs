@@ -8,6 +8,7 @@
 
 (require 'voicemacs-it)
 
+;; TODO: Redo the way these extension modules are loaded.
 (with-eval-after-load 'helm
   (require 'voicemacs-extend-helm))
 (with-eval-after-load 'dired
