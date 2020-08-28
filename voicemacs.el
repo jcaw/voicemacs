@@ -252,6 +252,34 @@ This function uses a similar method to that used by Flyspell."
   :defer nil)
 
 
+;; `evil-mode'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-eval-after-load 'evil
+  (defvar voicemacs--evil-state-hooks '(evil-emacs-state-entry-hook
+                                        evil-insert-state-entry-hook
+                                        evil-motion-state-entry-hook
+                                        evil-normal-state-entry-hook
+                                        evil-operator-state-entry-hook
+                                        evil-replace-state-entry-hook
+                                        evil-visual-state-entry-hook)
+    "Hooks that run on state entry for every default Evil state.")
+  (voicemacs-define-sync evil-state
+    :update (and evil-mode evil-state)
+    :enable (progn
+              (mapc (lambda (hook)
+                      (add-hook hook sync-func))
+                    voicemacs--evil-state-hooks)
+              ;; In case the hooks don't catch it.
+              (run-with-idle-timer 0 0 sync-func))
+    :disable (progn
+               (mapc (lambda (hook)
+                       (remove-hook hook sync-func))
+                     voicemacs--evil-state-hooks)
+               (cancel-function-timers sync-func))
+    :defer nil))
+
+
 ;; Text on Screen
 ;;;;;;;;;;;;;;;;;
 
