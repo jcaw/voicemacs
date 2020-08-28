@@ -243,13 +243,13 @@ This function uses a similar method to that used by Flyspell."
 
 ;; TODO: Maybe also sync `in-string-p'?
 (voicemacs-define-sync in-comment
- ;; Sending over the wire, so we need True or False, not truthiness
- :update (if (voicemacs-in-comment-p) t :json-false)
- :enable (run-with-idle-timer 0 0 sync-func)
- :disable (cancel-function-timers sync-func)
- ;; TODO: Forces regular syncs when we move cursor through a comment. can be
- ;;   slow, creates choppiness. Put this info in the title?
- :defer nil)
+  ;; Sending over the wire, so we need True or False, not truthiness
+  :update (if (voicemacs-in-comment-p) t :json-false)
+  :enable (run-with-idle-timer 0 0 sync-func)
+  :disable (cancel-function-timers sync-func)
+  ;; TODO: Forces regular syncs when we move cursor through a comment. can be
+  ;;   slow, creates choppiness. Put this info in the title?
+  :defer nil)
 
 
 ;; Text on Screen
