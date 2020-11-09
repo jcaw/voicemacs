@@ -283,7 +283,7 @@ This function uses a similar method to that used by Flyspell."
 
 
 ;; Text on Screen
-;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs--visible-text ()
