@@ -304,6 +304,33 @@ Returns a list, each item is the visible text for one window."
   :defer nil)
 
 
+;; Minibuffer Contents
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+(voicemacs-define-sync minibuffer-prompt
+  :update (minibuffer-prompt)
+  :enable (run-with-idle-timer 0 0 sync-func)
+  :disable (cancel-function-timers sync-func)
+  :defer nil)
+
+;; Note that a prompt *will not* be reported when `current-message' is called.
+;; Only `minibuffer-prompt' will get it.
+
+(voicemacs-define-sync current-message
+  ;; TODO: Crop extremely large current message?
+  :update (let ((message- (current-message))
+                ;; Restrict to ensure quick syncing
+                (max-message-length 1000))
+            (if (> (length message-) max-message-length)
+                (substring message- 0 max-message-length)
+              message-))
+  :enable (run-with-idle-timer 0 0 sync-func)
+  :disable (cancel-function-timers sync-func)
+  :defer nil)
+
+
 ;; Active Symbols
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
