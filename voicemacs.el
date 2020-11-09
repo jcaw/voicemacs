@@ -475,28 +475,6 @@ isearch function."
     (isearch-forward prefix)))
 
 
-(defun voicemacs-isearch-forward (&optional prefix)
-  "RPC isearch command. Start or repeat as needed.
-
-Prefix will be passed to new search."
-  (interactive "P")
-  (if isearch-mode
-      ;; Call interactively so we can use command injection.
-      (call-interactively 'isearch-repeat-forward)
-    (isearch-forward prefix)))
-
-
-(defun voicemacs-isearch-backward (&optional prefix)
-  "RPC isearch command. Start or repeat as needed.
-
-Prefix will be passed to new search."
-  (interactive "P")
-  (if isearch-mode
-      ;; Call interactively so we can use command injection.
-      (call-interactively 'isearch-repeat-backward)
-    (isearch-backward prefix)))
-
-
 ;; HACK: This can be used by the client to hold off on RPC calls until all
 ;;   existing input has been processed.
 (defun voicemacs-input-pending? ()
