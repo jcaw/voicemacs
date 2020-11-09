@@ -247,7 +247,8 @@ source."
        (error "Must provide each of `KEY', `UPDATE', `ENABLE' & `DISABLE'"))
      (when (and -delay (not -defer))
        (error "`DEFER' must be `t' if a `DELAY' is provided."))
-     (unless (string-match-p "[-a-zA-Z0-9]+" (format "%s" -key))
+     (unless (and (or (symbolp -key) (stringp -key))
+                  (string-match-p "[-a-zA-Z0-9]+" (format "%s" -key)))
        ;; Restrict the key format so the client can deal with it easily.
        (error "`KEY' may only contain letters, numbers and dashes"))
 
