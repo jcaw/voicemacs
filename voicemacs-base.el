@@ -254,13 +254,13 @@ source."
 
      ;; Generate function names
      (let* ((immediate-sync-func (voicemacs--format-symbol
-                                    "voicemacs--sync-%s" -key))
+                                  "voicemacs--sync-%s" -key))
             (deferred-sync-func (voicemacs--format-symbol
-                                   "voicemacs--queue-sync-%s" -key))
+                                 "voicemacs--queue-sync-%s" -key))
             (enable-sync-func (voicemacs--format-symbol
-                                 "voicemacs--enable-sync-%s" -key))
+                               "voicemacs--enable-sync-%s" -key))
             (disable-sync-func (voicemacs--format-symbol
-                                  "voicemacs--disable-sync-%s" -key))
+                                "voicemacs--disable-sync-%s" -key))
             (sync-action (if -defer deferred-sync-func immediate-sync-func)))
        ;; Tear down the previous version of the sync, if necessary
        (when (and voicemacs-mode (fboundp disable-sync-func))
