@@ -290,11 +290,15 @@ This function uses a similar method to that used by Flyspell."
   "Get all visible text in each window.
 
 Returns a list, each item is the visible text for one window."
-  (mapcar (lambda (window)
-            (with-selected-window window
-              (buffer-substring-no-properties (window-start) (window-end))))
-          ;; All windows
-          (cl-mapcan #'window-list (frame-list))))
+  (remove nil
+          (mapcar (lambda (window)
+                    ;; Sometimes tries to gether from invalid windows. Just
+                    ;; ignore those errors.
+                    (ignore-errors
+                      (with-selected-window window
+                        (buffer-substring-no-properties (window-start) (window-end)))))
+                  ;; All windows
+                  (cl-mapcan #'window-list (frame-list)))))
 
 
 (voicemacs-define-sync visible-text
