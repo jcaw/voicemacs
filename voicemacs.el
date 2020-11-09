@@ -492,6 +492,7 @@ it is ignored. The text around the field will be returned."
     nil))
 
 
+;; TODO: Just sync `isearch-forward'?
 (defun voicemacs-isearch-dwim (&optional prefix)
   "If isearching, repeat direction. Otherwise, start a forward isearch.
 
