@@ -304,6 +304,69 @@ Returns a list, each item is the visible text for one window."
   :defer nil)
 
 
+;; Active Symbols
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defconst voicemacs-max-symbol-range-before (expt 10 6)
+  "Max characters to scan after point when gathering symbols from buffer.")
+(defconst voicemacs-max-symbol-range-after  (expt 10 6)
+  "Max characters to scan before point when gathering symbols from buffer.")
+
+(defvar voicemacs--active-symbols (make-hash-table)
+  "Set of symbols that are \"present\" in the current context.")
+
+
+(defun voicemacs--symbols-in-buffer ()
+  "Get all symbols in the buffer.
+
+Note this only searches within the range defined by
+`voicemacs--max-symbol-range-before' and
+`voicemacs--max-symbol-range-after'."
+  ;; Only sync symbols for modes where it makes sense.
+  ;;
+  ;; TODO: Allow list of custom modes
+  (save-excursion
+    (let ((symbols (make-hash-table)))
+      (goto-char (max (- (point) voicemacs-max-symbol-range-before)))
+      (while (re-search-forward "[a-zA-Z0-9]"
+                                voicemacs-max-symbol-range-after
+                                t)
+        (let* ((bounds (bounds-of-thing-at-point 'symbol)))
+          (when bounds
+            (goto-char (cdr bounds))
+            ;; Only extract names from code
+            (unless (or (voicemacs-in-string-p)
+                        (voicemacs-in-comment-p))
+              (voicemacs--set-add (buffer-substring-no-properties
+                                   (car bounds) (cdr bounds))
+                                  symbols)))))
+      symbols)))
+
+
+(defun voicemacs--sync-symbols (&rest _)
+  ;; TODO: Allow this to cover multiple buffers. Segment by project.
+  (when (derived-mode-p 'text-mode 'prog-mode)
+    (setq voicemacs--active-symbols (voicemacs--symbols-in-buffer))))
+
+
+(defun voicemacs--syncable-symbols (&rest _)
+  ;; TODO: Extract probably from multiple buffers
+  (voicemacs--set-to-list voicemacs--active-symbols))
+
+
+(voicemacs-define-sync active-symbols
+  :update (progn (voicemacs--sync-symbols)
+                 ;; TODO: Only sync if they've changed.
+                 (voicemacs--syncable-symbols))
+  :enable (progn (add-hook 'first-change-hook sync-func)
+                 (voicemacs--hook-change-buffer sync-func))
+  :disable (progn (remove-hook 'first-change-hook sync-func)
+                  (voicemacs--unhook-change-buffer sync-func))
+  :defer t
+  :delay 0.1)
+
+
 ;; Emacs Metadata
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

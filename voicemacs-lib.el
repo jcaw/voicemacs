@@ -97,5 +97,26 @@ Like with `mapatoms', `OBARRAY-' defaults to the value of
     results))
 
 
+(defun voicemacs--set-to-list (set)
+  "Convert `set' (represented by a hash table) to a list."
+  (hash-table-keys set))
+
+
+(defun voicemacs--set-add (element set)
+  "Add `element' to `set' (represented by a hash table)."
+  (unless (voicemacs--set-contains? element set)
+    (puthash element t set)))
+
+
+(defun voicemacs--set-contains? (element set)
+  "Check if `element' is a member of `set' (represented by a hash table)."
+  (gethash element set nil))
+
+
+(defun voicemacs--set-remove (element set)
+  "Remove `element' from `set' (represented by a hash table)."
+  (remhash element set))
+
+
 (provide 'voicemacs-lib)
 ;;; voicemacs-lib.el ends here
