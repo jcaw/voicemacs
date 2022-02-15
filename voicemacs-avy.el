@@ -30,9 +30,14 @@ characters.")
          ;; home row.
          (avy-keys (string-to-list voicemacs-avy-keys))
          (result (apply avy-jump-command avy-command-args)))
-    ;; This means kill commands won't append, they'll create a fresh kill, but
-    ;; that may have other beneficial side effects
-    (setq last-command avy-jump-command)
+    ;; This means kill commands won't append, they'll create a fresh kill. We
+    ;; need this because we're doing a non-local kill action, so it shouldn't be
+    ;; appended. It's also important if we're trying to e.g. duplicate something
+    ;; with `voicemacs-save-avy-excursion'. We don't restrict this to just
+    ;; `(eq last-command 'kill-region)' because commands relying on
+    ;; `last-command' probably assume local behaviour - so disrupt that in all
+    ;; cases.
+    (setq last-command nil)
     (cond ((eq t result) (error "No candidates found"))
           ((not result) (error "Jump cancelled"))
           (t result))))
