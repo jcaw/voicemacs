@@ -16,6 +16,7 @@
           string))
 
 
+;; TODO: Convert these to question mark syntax
 (defun voicemacs--bound-and-true-p (symbol)
   "Is `symbol' both bound, and truthy?
 
