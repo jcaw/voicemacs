@@ -401,16 +401,17 @@ Note this only searches within the range defined by
   (voicemacs--set-to-list voicemacs--active-symbols))
 
 
-(voicemacs-define-sync active-symbols
-  :update (progn (voicemacs--sync-symbols)
-                 ;; TODO: Only sync if they've changed.
-                 (voicemacs--syncable-symbols))
-  :enable (progn (add-hook 'first-change-hook sync-func)
-                 (voicemacs--hook-change-buffer sync-func))
-  :disable (progn (remove-hook 'first-change-hook sync-func)
-                  (voicemacs--unhook-change-buffer sync-func))
-  :defer t
-  :delay 0.1)
+;; TODO: Maybe re-enable symbols? Was failing in ein.
+;; (voicemacs-define-sync active-symbols
+;;   :update (progn (voicemacs--sync-symbols)
+;;                  ;; TODO: Only sync if they've changed.
+;;                  (voicemacs--syncable-symbols))
+;;   :enable (progn (add-hook 'first-change-hook sync-func)
+;;                  (voicemacs--hook-change-buffer sync-func))
+;;   :disable (progn (remove-hook 'first-change-hook sync-func)
+;;                   (voicemacs--unhook-change-buffer sync-func))
+;;   :defer t
+;;   :delay 0.1)
 
 
 ;; Emacs Metadata
