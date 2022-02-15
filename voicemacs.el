@@ -551,7 +551,7 @@ Only the line at point is tracked. The region is ignored."
      (- (current-indentation) indentation-before)))
 
 
-(defun voicemacs-relative-indent (&optional amount)
+(defun voicemacs-relative-indent (&optional amount silent?)
   "Indent region `AMOUNT' backward from the automatic indentation level.
 
 If region is not active, operates on the line.
@@ -580,7 +580,7 @@ back `AMOUNT' number of tab stops."
             ;; Skip first line - we already indented it.
             (forward-line 1)
             ;; Implementation adapted from `indent.el'
-            (let ((pr (unless (minibufferp)
+            (let ((pr (unless (or silent? (minibufferp))
                         (make-progress-reporter "Indenting region..." (point) end-marker))))
               ;; (echo (point))
               ;; (echo end-marker)
