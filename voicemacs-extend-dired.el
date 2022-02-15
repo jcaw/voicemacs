@@ -10,7 +10,9 @@
 
 
 (defface voicemacs-dired-numbers-face
-  '((t :inherit 'font-lock-keyword-face))
+  ;; '((t :inherit 'font-lock-keyword-face))
+  ;; '((t :inherit 'font-lock-variable-name-face))
+  '((t :inherit 'font-lock-type-face))
   "Face used for Dired selection numbers.")
 
 
