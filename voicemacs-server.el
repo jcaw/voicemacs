@@ -124,21 +124,21 @@
          ;;
          ;; nonce first, so it can be included it in other errors
          ((eq nonce 'NOT-PROVIDED) (voicemacs--respond-error client nil "invalid-message"
-                                                              "No `nonce' was provided."))
+                                                             "No `nonce' was provided."))
          ((eq type 'NOT-PROVIDED) (voicemacs--respond-error client nonce "invalid-message"
-                                                             "No `type' was provided."))
+                                                            "No `type' was provided."))
          ((eq data 'NOT-PROVIDED) (voicemacs--respond-error client nonce "invalid-message"
-                                                             "No `data' was provided."))
+                                                            "No `data' was provided."))
          ((eq direction 'NOT-PROVIDED)
           (voicemacs--respond-error client nonce "invalid-message"
-                                     "No `direction' was provided."))
+                                    "No `direction' was provided."))
          ((not (stringp type)) (voicemacs--respond-error client nonce "invalid-message"
-                                                          "`type' must be a string."))
+                                                         "`type' must be a string."))
          ((not (hash-table-p data)) (voicemacs--respond-error client nonce "invalid-message"
-                                                               "`data' must be a dictionary."))
+                                                              "`data' must be a dictionary."))
          ((not (member direction '("request" "response")))
           (voicemacs--respond-error client nonce "invalid-message"
-                                     "`direction' must be either \"request\" or \"response\""))
+                                    "`direction' must be either \"request\" or \"response\""))
 
          ;; Basic message structure is fine, now dispatch to correct handler.
          ((and (string= direction "request") (string= type "authenticate"))
@@ -147,17 +147,17 @@
             (error
              ;; They aren't authed, so don't give them much information
              (voicemacs--respond-error client nonce "internal-error"
-                                        "An error occured during authorization."))))
+                                       "An error occured during authorization."))))
 
          ((not (ignore-errors (process-get client :authenticated)))
           (voicemacs--respond-error client nonce "not-authenticated"
-                                     "Client not authorized. Please request authorization."))
+                                    "Client not authorized. Please request authorization."))
 
          ((string= direction "request")
           (cond ((string= type "json-rpc-call") (voicemacs--json-rpc-call
                                                  client nonce data))
                 (t (voicemacs--respond-error client nonce "unrecognized-type"
-                                              "Did not recognize this request type."))))
+                                             "Did not recognize this request type."))))
          ((string= direction "response")
           ;; Right now there's only one type of outgoing message, so we assume
           ;;   every response is a response to that.
