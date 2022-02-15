@@ -77,11 +77,17 @@ These numbers can be used for selection."
   ;; stand out.
   ;;
   ;; TODO: Extract line numbers face?
-  (voicemacs--local-override-face 'line-number 'bold 'font-lock-keyword-face)
+  ;;
+  ;; FIXME: `bold' will override the color in some themes, e.g. `leuven'
+  ;; (voicemacs--local-override-face 'line-number 'bold 'font-lock-keyword-face)
+  (voicemacs--local-override-face 'line-number 'helm-bookmark-directory)
+  ;; (voicemacs--local-override-face 'line-number-current-line
+  ;;                                 'bold
+  ;;                                 'helm-selection
+  ;;                                 'font-lock-keyword-face)
   (voicemacs--local-override-face 'line-number-current-line
-                                  'bold
                                   'helm-selection
-                                  'font-lock-keyword-face)
+                                  'helm-bookmark-directory)
   (setq-local display-line-numbers 'absolute))
 
 
