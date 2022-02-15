@@ -532,6 +532,16 @@ isearch function."
 (voicemacs-expose-function 'voicemacs-input-pending?)
 
 
+(defun voicemacs-make-todo (keyword)
+  "Turn the current line into a TODO item."
+  (interactive "sTODO Keyword: ")
+  (unless (voicemacs-in-comment-p)
+    (comment-line nil))
+  (goto-char (it-inner-start (it-object-at 'comment)))
+  (insert keyword)
+  (insert ": "))
+
+
 (defmacro voicemacs-diff-indentation (&rest body)
   "Return the change in indentation at point after running `BODY'.
 
