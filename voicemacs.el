@@ -633,6 +633,14 @@ back `AMOUNT' number of tab stops."
                                          (point-at-eol))))))
 
 
+(defun voicemacs-set-enable-mark ()
+  "Set the mark at point (unless it's there already), and enable it."
+  (interactive)
+  (unless (= (car mark-ring) (point))
+    (set-mark (point)))
+  (activate-mark))
+
+
 ;; Misc Exposed Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
