@@ -89,9 +89,13 @@
     (while (setq match-pos (string-match "\0" message pos))
       (let ((full-message (concat (process-get client :message-so-far)
                                   (substring message pos match-pos))))
-        ;; Ignore double "\0"
-        (unless (string-empty-p full-message)
-          (voicemacs--handle-message client full-message)))
+        (cond
+         ;; Ignore double "\0" messages
+         ((string-empty-p full-message) nil)
+         ;; Ignore pings
+         ((string= full-message "\1") nil)
+         ;; Otherwise handle
+         (t (voicemacs--handle-message client full-message))))
       (process-put client :message-so-far "")
       (setq pos (+ match-pos (length "\0"))))
     (process-put client :message-so-far
