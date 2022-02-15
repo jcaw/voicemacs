@@ -10,6 +10,14 @@
   "Default jump command to use with `voicemacs-avy-jump'.")
 
 
+(defvar voicemacs-avy-keys "abcdefghijklmnopqrstuvwxyz'/#:\\-+_!£$*()[]{}"
+  "Chars to use for Voicemacs avy jumps.
+
+Note these will not override the default avy jump chars - only
+jumps instigated with `voicemacs-avy-jump' will use these
+characters.")
+
+
 (defun voicemacs-avy-jump (avy-jump-command &rest avy-command-args)
   "Run an avy command, raising an error if the jump fails."
   ;; TODO: Maybe expand available symbols?
@@ -19,7 +27,7 @@
          (avy-all-windows t)
          ;; We're using voice, so there is no advantage to restricting to the
          ;; home row.
-         (avy-keys (string-to-list "abcdefghijklmnopqrstuvwxyz"))
+         (avy-keys (string-to-list voicemacs-avy-keys))
          (result (apply avy-jump-command avy-command-args)))
     ;; This means kill commands won't append, they'll create a fresh kill, but
     ;; that may have other beneficial side effects
