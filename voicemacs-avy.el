@@ -49,30 +49,43 @@ Returns a cons cell with the window & position of the match.
       (window . ,(selected-window)))))
 
 
-(defun voicemacs-avy-copy (char)
-  (interactive (list (read-char "Char: ")))
-  (voicemacs-save-avy-excursion
-   (voicemacs-avy-jump 'avy-goto-subword-1 char)
-   (it-copy-dwim :flash t)))
+(defmacro voicemacs-defavy (name revert-point-after docstring &rest after-jump-body)
+  "Define a command that jumps, then iff successful, fires `AFTER-JUMP-BODY'.
+
+You must provide a docstring for commands defined with this
+macro."
+  (declare (doc-string 3) (indent defun))
+
+  ;; TODO: Optional docstring, intelligently check if one was provided.
+  `(defun ,name (char)
+     ,docstring
+     (interactive (list (read-char "Char: ")))
+     (,(if revert-point-after 'voicemacs-save-avy-excursion 'progn)
+      (voicemacs-avy-jump voicemacs-default-avy-jump-command char)
+      ,@after-jump-body)))
+
+
+(voicemacs-defavy voicemacs-avy-copy nil
+  "Jump, then copy the `it-thing' at point."
+  (it-copy-dwim :flash t))
+
+
 
 
 ;; TODO: Jump back after this? Pad?
-(defun voicemacs-avy-kill (char)
-  (interactive (list (read-char "Char: ")))
-  (voicemacs-avy-jump 'avy-goto-subword-1 char)
+(voicemacs-defavy voicemacs-avy-kill nil
+  "Jump, then kill the `it-thing' at point."
   (it-kill-dwim :flash t))
 
 
-(defun voicemacs-avy-mark (char)
-  (interactive (list (read-char "Char: ")))
-  (voicemacs-avy-jump 'avy-goto-subword-1 char)
+(voicemacs-defavy voicemacs-avy-mark nil
+  "Jump, then mark the `it-thing' at point."
   (it-mark-dwim))
 
 
 ;; TODO: Switch to `it' for all flashing?
-(defun voicemacs-avy-yank (char)
-  (interactive (list (read-char "Char: ")))
-  (voicemacs-avy-jump 'avy-goto-char char)
+(voicemacs-defavy voicemacs-avy-yank nil
+  "Jump, then yank the `it-thing' at point."
   (voicemacs-visual-yank :flash t))
 
 
