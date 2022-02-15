@@ -38,6 +38,7 @@ rather than `nil'."
 (with-eval-after-load 'it
   ;; TODO: Maybe just expose all `it' actions?
   (voicemacs-expose-function 'it-wrap)
+  (voicemacs-expose-function 'it-text-of-thing-at-dwim)
 
   (voicemacs-define-sync it-object-types
     :update (voicemacs--it-object-types)
