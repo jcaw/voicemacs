@@ -574,15 +574,15 @@ back `AMOUNT' number of tab stops."
                                (deactivate-mark)
                                (voicemacs-diff-indentation
                                 (indent-according-to-mode)))))
-            (echo (point))
-            (echo end-marker)
+            ;; (echo (point))
+            ;; (echo end-marker)
             ;; Skip first line - we already indented it.
             (forward-line 1)
             ;; Implementation adapted from `indent.el'
             (let ((pr (unless (minibufferp)
                         (make-progress-reporter "Indenting region..." (point) end-marker))))
-              (echo (point))
-              (echo end-marker)
+              ;; (echo (point))
+              ;; (echo end-marker)
               (while (< (point) end-marker)
                 (or (and (bolp) (eolp))
                     (indent-line-to (+ (current-indentation) difference)))
