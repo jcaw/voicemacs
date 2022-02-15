@@ -655,6 +655,16 @@ back `AMOUNT' number of tab stops."
 (voicemacs-expose-function 'voicemacs-find-file)
 
 
+(defun voicemacs-insert (text)
+  "Insert text via RPC, and run relevant hooks.
+
+This may be faster than inserting key-by-key."
+  ;; FIXME: Maybe use a higher-level interactive call?
+  ;; FIXME: Hooks to keys?
+  (command-execute (lambda () (interactive) (insert text)) t))
+(voicemacs-expose-function 'voicemacs-insert)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
