@@ -17,6 +17,9 @@
          ;; home row.
          (avy-keys (string-to-list "abcdefghijklmnopqrstuvwxyz"))
          (result (apply avy-jump-command args)))
+    ;; This means kill commands won't append, they'll create a fresh kill, but
+    ;; that may have other beneficial side effects
+    (setq last-command avy-jump-command)
     (cond ((eq t result) (error "No candidates found"))
           ((not result) (error "Jump cancelled"))
           (t result))))
