@@ -21,7 +21,6 @@ characters.")
 (defun voicemacs-avy-jump (avy-jump-command &rest avy-command-args)
   "Run an avy command, raising an error if the jump fails."
   ;; TODO: Maybe expand available symbols?
-  ;;
   (let* (
          ;; TODO: Is this the right place to ensure we're using old windows?
          (avy-all-windows t)
