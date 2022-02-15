@@ -119,6 +119,15 @@ Advice will be run `:after' defun."
   :delay 1)
 
 
+;; Buffer name sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(voicemacs-define-sync-change-buffer buffer-name
+  :update (buffer-name)
+  :defer t)
+
+
 ;; Yasnippets Sync
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
