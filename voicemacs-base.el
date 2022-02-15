@@ -341,6 +341,7 @@ is a heuristic. It has a huge false-positive rate; `func' will
 fire often, even if the buffer hasn't changed. Don't hook slow
 functions."
   ;; TODO: Observe buffer changes more directly, these are dodgy heuristics.
+  ;; TODO: Maybe hook buffer change? Have a look at it. Idle might be enough.
   (add-hook 'after-change-major-mode-hook func)
   ;; This is a reasonable proxy for when we're switching the buffer.
   (add-hook 'post-command-hook func)
