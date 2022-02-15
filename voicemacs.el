@@ -5,6 +5,7 @@
 (require 'voicemacs-command)
 
 (require 'voicemacs-avy)
+(require 'voicemacs-correct)
 
 (require 'voicemacs-it)
 
