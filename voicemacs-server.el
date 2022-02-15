@@ -250,6 +250,11 @@ constructed with this method."
 
 
 (defun voicemacs--json-rpc-call (client nonce data)
+  (when unread-command-events
+    ;; HACK: Flush the command queue first - don't want RPC calls to be
+    ;;   processed before queued commands.
+    (message "Unread command events!")
+    (redisplay))
   (voicemacs--send
    client
    (voicemacs--make-response
