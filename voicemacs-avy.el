@@ -10,6 +10,8 @@
   "Default jump command to use with `voicemacs-avy-jump'.")
 
 
+;; FIXME: This prefers {} for the narrowing char. Use something more
+;;   comprehensible at the end of the list?
 (defvar voicemacs-avy-keys "abcdefghijklmnopqrstuvwxyz'/#:\\-+_!£$*()[]{}"
   "Chars to use for Voicemacs avy jumps.
 
