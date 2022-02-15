@@ -3,6 +3,11 @@
 (require 'voicemacs-base)
 
 
+;; TODO: Maybe check the nature of the current buffer? This seems janky.
+;;
+;; (eq (current-buffer)
+;;     (with-helm-buffer (ignore-errors
+;;                         (current-buffer))))
 (voicemacs-define-sync-change-buffer in-helm-prompt
   :update (bound-and-true-p helm-alive-p)
   :defer nil)
