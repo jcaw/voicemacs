@@ -13,6 +13,12 @@
   :defer nil)
 
 
+;; The minibuffer prompt for the current helm session
+;; (voicemacs-define-sync-change-buffer helm-prompt-text
+;;   :update (and (bound-and-true-p helm-alive-p) helm--prompt)
+;;   :defer nil)
+
+
 ;; The name of the current helm buffer
 (voicemacs-define-sync-change-buffer helm-buffer-name
   :update (and (bound-and-true-p helm-alive-p)
