@@ -56,6 +56,7 @@ infinite loops on a recursive call."
   (sit-for 0.1))
 
 
+;; TODO: Only expose this while minor mode active?
 (voicemacs-expose-function 'voicemacs-helm-goto-line)
 
 
