@@ -17,6 +17,12 @@
   (require 'voicemacs-extend-company))
 
 
+(voicemacs-define-sync voicemacs
+  :update t
+  :enable nil
+  :disable nil)
+
+
 ;; Major Mode Sync
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
