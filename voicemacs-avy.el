@@ -6,7 +6,11 @@
 (require 'voicemacs-lib)
 
 
-(defun voicemacs-avy-jump (avy-jump-command &rest args)
+(defvar voicemacs-default-avy-jump-command 'avy-goto-subword-1
+  "Default jump command to use with `voicemacs-avy-jump'.")
+
+
+(defun voicemacs-avy-jump (avy-jump-command &rest avy-command-args)
   "Run an avy command, raising an error if the jump fails."
   ;; TODO: Maybe expand available symbols?
   ;;
@@ -16,7 +20,7 @@
          ;; We're using voice, so there is no advantage to restricting to the
          ;; home row.
          (avy-keys (string-to-list "abcdefghijklmnopqrstuvwxyz"))
-         (result (apply avy-jump-command args)))
+         (result (apply avy-jump-command avy-command-args)))
     ;; This means kill commands won't append, they'll create a fresh kill, but
     ;; that may have other beneficial side effects
     (setq last-command avy-jump-command)
@@ -93,7 +97,7 @@ macro."
   (interactive (list (read-char "Char: ")))
   ;; TODO: Possible to combine both of these in one undo stage?
   (voicemacs-save-avy-excursion
-   (voicemacs-avy-jump 'avy-goto-subword-1 char)
+   (voicemacs-avy-jump voicemacs-default-avy-jump-command char)
    (it-kill-dwim :flash t))
   (voicemacs-visual-insert (car kill-ring)))
 
@@ -102,7 +106,7 @@ macro."
   (interactive (list (read-char "Char: ")))
   ;; TODO: Possible to combine both of these in one undo stage?
   (voicemacs-save-avy-excursion
-   (voicemacs-avy-jump 'avy-goto-subword-1 char)
+   (voicemacs-avy-jump voicemacs-default-avy-jump-command char)
    (it-copy-dwim :flash t))
   (voicemacs-visual-insert (car kill-ring)))
 
