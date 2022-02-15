@@ -131,6 +131,13 @@ macro."
   (it-kill-word))
 
 
+(voicemacs-defavy voicemacs-avy-end-of-word-or-thing (char)
+  "Jump to the end of the word at `char', or the `it-thing' if not a word."
+  (goto-char (or (cdr (bounds-of-thing-at-point 'word))
+                 (cdr (it-bounds (it-object-at 'sexp (point))))
+                 (point))))
+
+
 ;; TODO: `voicemacs-avy-join'
 
 
