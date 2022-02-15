@@ -571,7 +571,8 @@ back `AMOUNT' number of tab stops."
           (let* ((end-marker (copy-marker (region-end)))
                  (difference (progn
                                (goto-char (region-beginning))
-                               (deactivate-mark)
+                               ;; TODO: Force deactivate?
+                               (deactivate-mark t)
                                (voicemacs-diff-indentation
                                 (indent-according-to-mode)))))
             ;; (echo (point))
@@ -589,7 +590,7 @@ back `AMOUNT' number of tab stops."
                 (forward-line 1)
                 (and pr (progress-reporter-update pr (point))))
               (and pr (progress-reporter-done pr)))
-            (activate-mark))))
+            (activate-mark t))))
     (indent-according-to-mode))
   ;; Now reduce indentation from relative point
   (voicemacs-indent-rigidly-left amount)
