@@ -13,6 +13,22 @@
   :defer nil)
 
 
+;; The name of the current helm buffer
+(voicemacs-define-sync-change-buffer helm-buffer-name
+  :update (and (bound-and-true-p helm-alive-p)
+               helm-last-buffer)
+  :defer nil)
+
+
+;; Hacky. Might not work.
+(voicemacs-define-sync-change-buffer helm-title
+  :update (when (bound-and-true-p helm-alive-p)
+            (with-helm-buffer
+              (buffer-substring-no-properties (line-beginning-position 0)
+                                              (line-end-position 0))))
+  :defer nil)
+
+
 (defun voicemacs--helm-line-number ()
   "Line number of the current candidate."
   (with-helm-buffer (line-number-at-pos)))
@@ -117,6 +133,17 @@ Allows helm-swoop to be invoked via RPC without blocking."
   (run-with-timer 0 nil 'helm-swoop :query query))
 
 (voicemacs-expose-function 'voicemacs-helm-swoop)
+
+
+(defun voicemacs-helm-submit-if-single-match ()
+  "Submit the match if only one exists."
+  ;; Ensure matches are updated
+  (when (helm--updating-p)
+    (helm-refresh))
+  ;; TODO: How to get currently matching candidates?
+  (helm-candidate-number-limit)
+  (helm-confirm-and-exit-minibuffer)
+  )
 
 
 (provide 'voicemacs-extend-helm)
