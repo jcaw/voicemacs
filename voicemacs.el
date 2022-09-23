@@ -18,6 +18,8 @@
   (require 'voicemacs-extend-company))
 
 
+(require 'yasnippet)
+
 (voicemacs-define-sync voicemacs
   :update t
   :enable nil
