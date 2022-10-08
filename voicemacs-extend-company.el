@@ -91,7 +91,9 @@ Like `company-complete-number', but gives visual feedback."
   "Intercept `company-fill-propertize' to number more candidates."
   ;; This is hard-coded to format correctly only with numbers up to double
   ;; digits.
-  (when company-show-numbers
+  (when (and company-show-numbers
+             right
+             (not (bound-and-true-p company-box-mode)))
     (let ((original-number (string-to-number right)))
       ;; Get the new number
       (if (= 1 original-number)
