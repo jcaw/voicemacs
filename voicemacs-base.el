@@ -59,7 +59,12 @@ Will raise an error if the items can't be serialized."
 
 (defun voicemacs--update-if-changed (key value)
   "Update data under `key', iff `value' is different."
-  (unless (voicemacs--equal value (voicemacs--get-data key))
+  (unless (condition-case nil
+              (voicemacs--equal value (voicemacs--get-data key))
+            (wrong-type-argument
+             ;; HACK: Some strings can't be serialized - if that happens, return
+             ;;   `t' to suppress updates.
+             t))
     (voicemacs-update-data key value)))
 
 
