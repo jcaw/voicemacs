@@ -93,7 +93,9 @@ Like `company-complete-number', but gives visual feedback."
   ;; This is hard-coded to format correctly only with numbers up to double
   ;; digits.
   (when (and company-show-numbers
+             ;; It'll crash if we try and put an empty `right' through this process
              right
+             ;; Number display method is different in company mode - we handle it elsewhere
              (not (bound-and-true-p company-box-mode)))
     (let ((original-number (string-to-number right)))
       ;; Get the new number
