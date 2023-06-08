@@ -125,15 +125,14 @@ restored when the mode is deactivated.")
 
 (defun voicemacs--company-numbers-setup ()
   "Teardown for `voicemacs-company-more-numbers-mode'."
-  (setq voicemacs--company-original-show-numbers
-        (default-value company-show-numbers))
-  (setq-default company-show-numbers t)
+  (setq voicemacs--company-original-show-numbers (default-value company-show-quick-access))
+  (setq-default company-show-quick-access t)
   (advice-add 'company-fill-propertize :around 'voicemacs-company-fill-propertize))
 
 
 (defun voicemacs--company-numbers-teardown ()
   "Teardown for `voicemacs-company-more-numbers-mode'."
-  (setq-default company-show-numbers voicemacs--company-original-show-numbers)
+  (setq-default company-show-quick-access voicemacs--company-original-show-numbers)
   (advice-remove 'company-fill-propertize 'voicemacs-company-fill-propertize))
 
 
