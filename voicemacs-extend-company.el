@@ -1,6 +1,7 @@
 (require 'company)
 (require 'company-quickhelp)
 (require 'cl)
+(require 'el-patch)
 
 (require 'voicemacs-base)
 (require 'voicemacs-lib)
@@ -146,7 +147,44 @@ restored when the mode is deactivated.")
                 (voicemacs--company-numbers-teardown)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(el-patch-feature company-box)
+(with-eval-after-load 'company-box
+  ;; HACK: Outright redefine how company box shows numbers to allow numbers greater than 0-9
+  ;;   (el-patch-defun company-box--update-numbers (start)
+  ;;     (let ((side (if (eq company-show-quick-access 'left) 'left-margin 'right-margin))
+
+  ;;           (inhibit-redisplay t)
+  ;;           (inhibit-modification-hooks t))
+  ;;       (company-box--remove-numbers side)
+  ;;       (dotimes (index company-box-max-candidates)
+  ;;         (-some--> start
+  ;;           (if (get-text-property it 'company-box--number-pos)
+  ;;               it
+  ;;             (next-single-property-change it 'company-box--number-pos))
+  ;;           (progn
+  ;;             (push it company-box--numbers-pos)
+  ;;             (setq start (1+ it)))
+  ;;           (put-text-property (1- it) it 'display `((margin ,side) ,(int-to-string (1+ index))))))))
+  (el-patch-defun company-box--update-numbers (start)
+    (let ((side (if (eq company-show-quick-access 'left) 'left-margin 'right-margin))
+          (el-patch-remove (offset (if (eq company-show-quick-access 'left) 0 10)))
+          (inhibit-redisplay t)
+          (inhibit-modification-hooks t))
+      (company-box--remove-numbers side)
+      (dotimes (index (el-patch-swap 10 company-box-max-candidates))
+        (-some--> start
+          (if (get-text-property it 'company-box--number-pos)
+              it
+            (next-single-property-change it 'company-box--number-pos))
+          (progn
+            (push it company-box--numbers-pos)
+            (setq start (1+ it)))
+          (put-text-property (1- it) it 'display `((margin ,side) ,(el-patch-swap (aref company-box--numbers (+ index offset))
+                                                                                  (int-to-string (1+ index)))))))))
+  )
+
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs-company-apply-recommended-defaults ()
