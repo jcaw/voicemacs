@@ -337,7 +337,6 @@ Returns a list, each item is the visible text for one window."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
 (voicemacs-define-sync minibuffer-prompt
   :update (minibuffer-prompt)
   :enable (run-with-idle-timer 0 0 sync-func)
