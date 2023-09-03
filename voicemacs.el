@@ -129,6 +129,15 @@ Advice will be run `:after' defun."
   :defer t)
 
 
+;; File path sync
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(voicemacs-define-sync-change-buffer buffer-file-name
+  :update (buffer-file-name)
+  :defer t)
+
+
 ;; Yasnippets Sync
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
