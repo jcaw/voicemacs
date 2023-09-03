@@ -38,7 +38,9 @@ the function from ordinary timers."
 
 
 (defun voicemacs--equal (item-1 item-2)
-  "Check equality of two objects - tolerates equivalent hash maps."
+  "Check equality of two objects - tolerates equivalent hash maps.
+
+Will raise an error if the items can't be serialized."
   (or (equal item-1 item-2)
       ;; Check JSON forms so we can tolerate hash maps.
       ;;
