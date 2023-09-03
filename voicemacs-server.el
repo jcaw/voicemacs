@@ -327,6 +327,7 @@ is already connected, the new client will be rejected."
 
 
 (defconst voicemacs--base-temp-dir
+  ;; TODO: Switch this over to use the same server file style as emacs-server?
   (pcase system-type
     ('gnu/linux (voicemacs--get-linux-temp-dir))
     ('windows-nt (getenv "TEMP"))
