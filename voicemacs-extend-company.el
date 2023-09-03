@@ -1,6 +1,7 @@
 (require 'company)
 (require 'company-quickhelp)
 (require 'cl)
+(require 'el-patch)
 
 (require 'voicemacs-base)
 (require 'voicemacs-lib)
@@ -91,7 +92,11 @@ Like `company-complete-number', but gives visual feedback."
   "Intercept `company-fill-propertize' to number more candidates."
   ;; This is hard-coded to format correctly only with numbers up to double
   ;; digits.
-  (when company-show-numbers
+  (when (and company-show-numbers
+             ;; It'll crash if we try and put an empty `right' through this process
+             right
+             ;; Number display method is different in company mode - we handle it elsewhere
+             (not (bound-and-true-p company-box-mode)))
     (let ((original-number (string-to-number right)))
       ;; Get the new number
       (if (= 1 original-number)
@@ -122,15 +127,14 @@ restored when the mode is deactivated.")
 
 (defun voicemacs--company-numbers-setup ()
   "Teardown for `voicemacs-company-more-numbers-mode'."
-  (setq voicemacs--company-original-show-numbers
-        (default-value company-show-numbers))
-  (setq-default company-show-numbers t)
+  (setq voicemacs--company-original-show-numbers (default-value company-show-quick-access))
+  (setq-default company-show-quick-access t)
   (advice-add 'company-fill-propertize :around 'voicemacs-company-fill-propertize))
 
 
 (defun voicemacs--company-numbers-teardown ()
   "Teardown for `voicemacs-company-more-numbers-mode'."
-  (setq-default company-show-numbers voicemacs--company-original-show-numbers)
+  (setq-default company-show-quick-access voicemacs--company-original-show-numbers)
   (advice-remove 'company-fill-propertize 'voicemacs-company-fill-propertize))
 
 
@@ -144,7 +148,44 @@ restored when the mode is deactivated.")
                 (voicemacs--company-numbers-teardown)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(el-patch-feature company-box)
+(with-eval-after-load 'company-box
+  ;; HACK: Outright redefine how company box shows numbers to allow numbers greater than 0-9
+  ;;   (el-patch-defun company-box--update-numbers (start)
+  ;;     (let ((side (if (eq company-show-quick-access 'left) 'left-margin 'right-margin))
+
+  ;;           (inhibit-redisplay t)
+  ;;           (inhibit-modification-hooks t))
+  ;;       (company-box--remove-numbers side)
+  ;;       (dotimes (index company-box-max-candidates)
+  ;;         (-some--> start
+  ;;           (if (get-text-property it 'company-box--number-pos)
+  ;;               it
+  ;;             (next-single-property-change it 'company-box--number-pos))
+  ;;           (progn
+  ;;             (push it company-box--numbers-pos)
+  ;;             (setq start (1+ it)))
+  ;;           (put-text-property (1- it) it 'display `((margin ,side) ,(int-to-string (1+ index))))))))
+  (el-patch-defun company-box--update-numbers (start)
+    (let ((side (if (eq company-show-quick-access 'left) 'left-margin 'right-margin))
+          (el-patch-remove (offset (if (eq company-show-quick-access 'left) 0 10)))
+          (inhibit-redisplay t)
+          (inhibit-modification-hooks t))
+      (company-box--remove-numbers side)
+      (dotimes (index (el-patch-swap 10 company-box-max-candidates))
+        (-some--> start
+          (if (get-text-property it 'company-box--number-pos)
+              it
+            (next-single-property-change it 'company-box--number-pos))
+          (progn
+            (push it company-box--numbers-pos)
+            (setq start (1+ it)))
+          (put-text-property (1- it) it 'display `((margin ,side) ,(el-patch-swap (aref company-box--numbers (+ index offset))
+                                                                                  (int-to-string (1+ index)))))))))
+  )
+
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun voicemacs-company-apply-recommended-defaults ()
