@@ -7,6 +7,7 @@
   :prefix "voicemacs-")
 
 
+;; TODO: Use a set, not a list - more efficient
 (defvar voicemacs--exposed-functions '()
   "Functions that should be exposed by voicemacs.")
 
