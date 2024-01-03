@@ -112,7 +112,7 @@ buffers."
   (redisplay t))
 
 
-(voicemacs-expose-function 'voicemacs-dired-move-to-item)
+(voicemacs-expose-function #'voicemacs-dired-move-to-item)
 
 
 (defmacro voicemacs--dired-mapc (&rest body)
@@ -138,12 +138,12 @@ Defer to avoid duplicating work, and for compatibility with
 certain dired rendering schemes (e.g. Doom Emacs hides \".\" &
 \"..\" after candidates are inserted, but that won't remove their
 number overlays)."
-  (voicemacs--queue-once 'voicemacs--dired-renumber-buffer
+  (voicemacs--queue-once #'voicemacs--dired-renumber-buffer
                          :args (list (current-buffer))))
 
 
 (defun voicemacs--dired-numbers-mode-setup ()
-  (add-hook 'dired-after-readin-hook 'voicemacs--dired-queue-renumber)
+  (add-hook 'dired-after-readin-hook #'voicemacs--dired-queue-renumber)
   (voicemacs--dired-mapc
    (voicemacs--dired-insert-numbers))
   ;; Make it easier to jump to the numbers with keyboard.
@@ -152,7 +152,7 @@ number overlays)."
 
 
 (defun voicemacs--dired-numbers-mode-teardown ()
-  (remove-hook 'dired-after-readin-hook 'voicemacs--dired-queue-renumber)
+  (remove-hook 'dired-after-readin-hook #'voicemacs--dired-queue-renumber)
   (voicemacs--dired-mapc
    (voicemacs--dired-remove-overlays)))
 
