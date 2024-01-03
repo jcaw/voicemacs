@@ -691,5 +691,10 @@ This may be faster than inserting key-by-key."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;; TODO: Pass back the specific frames this voicemacs session is covering. I.e.
+;;   the window IDs. (But how to handle WSL?) Or, perhaps just return whether
+;;   one of the current frames has focus?
+
+
 (provide 'voicemacs)
 ;;; voicemacs.el ends here
