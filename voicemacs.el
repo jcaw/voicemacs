@@ -674,6 +674,20 @@ This may be faster than inserting key-by-key."
 (voicemacs-expose-function 'voicemacs-insert)
 
 
+(defun voicemacs-leader-key-details ()
+  "Gets the current leader key, and whether it was the last key pressed."
+  (cond ((boundp 'doom-leader-alt-key)
+         (list doom-leader-alt-key
+               (or (equal last-input-event (elt (kbd doom-leader-alt-key) 0))
+                   :json-false)))
+        ((boundp 'dotspacemacs-leader-key)
+         (list dotspacemacs-leader-key
+               (or (equal last-input-event (elt (kbd dotspacemacs-leader-key) 0))
+                   :json-false)))
+        (t (nil :json-false))))
+(voicemacs-expose-function 'voicemacs-leader-key-details)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
