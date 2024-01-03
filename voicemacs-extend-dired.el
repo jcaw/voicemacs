@@ -90,6 +90,13 @@ buffers."
     (error "Dired item with this number was not found.")))
 
 
+(defun voicemacs-dired-handle-return (&optional prefix)
+  (interactive "P")
+  (if prefix
+      (voicemacs--move-to-dired-item prefix)
+    (call-interactively #'dired-find-file)))
+
+
 (defun voicemacs-dired-move-to-item (&optional item-number)
   "Move cursor to a numbered item in the dired buffer."
   (interactive "P")
@@ -138,7 +145,10 @@ number overlays)."
 (defun voicemacs--dired-numbers-mode-setup ()
   (add-hook 'dired-after-readin-hook 'voicemacs--dired-queue-renumber)
   (voicemacs--dired-mapc
-   (voicemacs--dired-insert-numbers)))
+   (voicemacs--dired-insert-numbers))
+  ;; Make it easier to jump to the numbers with keyboard.
+  ;; FIXME: This rebind will be permanent. Make it enable/disable predictably.
+  (define-key dired-mode-map (kbd "RET") #'voicemacs-dired-handle-return))
 
 
 (defun voicemacs--dired-numbers-mode-teardown ()
