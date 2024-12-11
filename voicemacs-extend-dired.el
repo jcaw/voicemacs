@@ -78,6 +78,7 @@ buffers."
   "Move to a numbered dired item.
 
 `NUMBER' - the number of the item."
+  (cl-assert (and (integerp number) (>= number 1)) t)
   (unless voicemacs--dired-number-overlays
     (error "No numbered dired candidates available."))
   (catch 'item-found
@@ -92,15 +93,22 @@ buffers."
 
 (defun voicemacs-dired-handle-return (&optional prefix)
   (interactive "P")
+  ;; Causes weird hangs if we try to find the file in the same action, so it's disabled for now.
   (if prefix
       (voicemacs--move-to-dired-item prefix)
     (call-interactively #'dired-find-file)))
 
 
+(defun voicemacs-dired-handle-tab (&optional prefix)
+  (if prefix
+      (voicemacs--move-to-dired-item prefix)
+    (call-interactively #'indent-for-tab-command)))
+
+
 (defun voicemacs-dired-move-to-item (&optional item-number)
   "Move cursor to a numbered item in the dired buffer."
   (interactive "P")
-  (assert (eq major-mode 'dired-mode))
+  (cl-assert (eq major-mode 'dired-mode))
   (voicemacs--move-to-dired-item item-number)
   ;; Ensure the move is shown to the user immediately.
   (redisplay t)
@@ -148,7 +156,8 @@ number overlays)."
    (voicemacs--dired-insert-numbers))
   ;; Make it easier to jump to the numbers with keyboard.
   ;; FIXME: This rebind will be permanent. Make it enable/disable predictably.
-  (define-key dired-mode-map (kbd "RET") #'voicemacs-dired-handle-return))
+  (define-key dired-mode-map (kbd "RET") #'voicemacs-dired-handle-return)
+  (define-key dired-mode-map (kbd "TAB") #'voicemacs-dired-handle-tab))
 
 
 (defun voicemacs--dired-numbers-mode-teardown ()
