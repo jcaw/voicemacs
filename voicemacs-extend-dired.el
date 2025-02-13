@@ -176,49 +176,7 @@ number overlays)."
                 (voicemacs--dired-numbers-mode-teardown)))
 
 
-(defvar voicemacs--dired-digits-so-far ""
-  "The digits that have been pressed so far in the current numeric key sequence.
-
-This is only used with `TODO: when key accumulation active'.")
-
-
-(defconst voicemacs--dired-process-digit-commands '()
-  "All the digit processing command symbols.")
-
-
-;; Create commands to process each digit
-(dotimes (n 10)  ; 0-9
-  (eval
-   `(let* ((n-str (format "%s" ,n))
-           (command-symbol (intern (s-concat "voicemacs-dired-process-digit-" n-str))))
-      (eval
-       `(progn
-          (defun ,command-symbol ()
-            ,(format "Process the digit %s as a quickmove command in `voicemacs-dired-mode'." n-str)
-            (interactive)
-            (unless (member last-command voicemacs--dired-process-digit-commands)
-              (setq voicemacs--dired-digits-so-far ""))
-            (setq voicemacs--dired-digits-so-far (s-concat voicemacs--dired-digits-so-far ,n-str))
-            (condition-case err
-                (voicemacs-dired-move-to-item (string-to-number voicemacs--dired-digits-so-far))
-              (error
-               ;; If there's no valid target, we restart the sequence. This is a
-               ;; convenience feature so the user doesn't always need to tap a
-               ;; different key to restart the sequence.
-               (message "Error moving to target")
-               (setq voicemacs--dired-digits-so-far "")
-               (voicemacs-dired-move-to-item ,n)
-               ;; Note we only store the digit as part of the list if it succeeded. Otherwise, all subsequent movements will fail.
-               (setq voicemacs--dired-digits-so-far ,n-str))))
-
-          (add-to-list 'voicemacs--dired-process-digit-commands ',command-symbol)
-
-          ;; TODO 1: Bind the key properly, probably just in `voicemacs-dired-numbers-mode'
-          (map! :mode dired-mode
-                ,n-str #',command-symbol)
-          )
-       t))
-   t))
+(voicemacs-bind-cumulative-number-commands "dired" #'voicemacs-dired-move-to-item 'dired-mode-map)
 
 
 (provide 'voicemacs-extend-dired)

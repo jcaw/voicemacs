@@ -364,5 +364,61 @@ functions."
   (cancel-function-timers func))
 
 
+(defvar voicemacs--digits-so-far ""
+  "The digits that have been pressed so far in the current numeric key sequence.
+
+This is only used with `TODO: when key accumulation active'.")
+
+
+(defconst voicemacs--process-digit-commands '()
+  "All the digit processing command symbols.")
+
+
+(defun voicemacs-bind-cumulative-number-commands (mode-prefix move-function keymap)
+  "Make basic number keypresses select items in a voicemacs number selection context.
+
+This tracks digit keypresses and creates commands to handle the
+overall number entered, which are bound in `keymap'. Each
+keypress, `move-function' is called on the raw number."
+  (assert (symbolp move-function))
+  (dotimes (n 10)  ; 0-9
+    (eval
+     `(let* ((n-str (format "%s" ,n))
+             (command-symbol (intern (s-concat "voicemacs-" mode-prefix "-process-digit-" n-str))))
+        (eval
+         `(progn
+            (defun ,command-symbol ()
+              ,(format "Process the digit %s as a quickmove command in %s." mode-prefix n-str)
+              (interactive)
+              (unless (member last-command voicemacs--process-digit-commands)
+                (setq voicemacs--digits-so-far ""))
+              (setq voicemacs--digits-so-far (s-concat voicemacs--digits-so-far ,n-str))
+              (condition-case err
+                  (apply #',move-function (list (string-to-number voicemacs--digits-so-far)))
+                (error
+                 ;; If there's no valid target, we restart the sequence. This is a
+                 ;; convenience feature so the user doesn't always need to tap a
+                 ;; different key to restart the sequence.
+                 (message "Error moving to target")
+                 (setq voicemacs--digits-so-far "")
+
+                 (apply #',move-function (list ,n))
+
+                 ;; Note we only store the digit as part of the list if it succeeded. Otherwise, all subsequent movements will fail.
+                 (setq voicemacs--digits-so-far ,n-str))))
+
+            (add-to-list 'voicemacs--process-digit-commands ',command-symbol)
+
+            (bind-key ,n-str #',command-symbol ',keymap)
+            ;; TODO: Possibly also bind the prefixed number to act as the ordinary number command.
+            )
+         t))
+     t))
+  )
+
+
+
+
+
 (provide 'voicemacs-base)
 ;;; voicemacs-base.el ends here

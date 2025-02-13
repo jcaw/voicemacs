@@ -185,6 +185,10 @@ restored when the mode is deactivated.")
   )
 
 
+;; FIXME: This doesn't error when you hit an invalid number, so the numbers don't auto-reset.
+(voicemacs-bind-cumulative-number-commands "company" #'voicemacs-company-highlight 'company-active-map)
+
+
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

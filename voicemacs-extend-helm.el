@@ -129,8 +129,11 @@ Incompatible with `helm-display-line-numbers-mode'."
                   (voicemacs--helm-numbers-mode-setup)
                 (voicemacs--helm-numbers-mode-teardown)))
 
-
 ;; TODO: System for enabling by default?
+
+
+;; FIXME: Find the right map for it to only be active in the minibuffer.
+(voicemacs-bind-cumulative-number-commands "helm" #'voicemacs-helm-goto-line 'helm-map)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
