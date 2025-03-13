@@ -684,7 +684,7 @@ This may be faster than inserting key-by-key."
          (list dotspacemacs-leader-key
                (or (equal last-input-event (elt (kbd dotspacemacs-leader-key) 0))
                    :json-false)))
-        (t (nil :json-false))))
+        (t '(nil :json-false))))
 (voicemacs-expose-function 'voicemacs-leader-key-details)
 
 
