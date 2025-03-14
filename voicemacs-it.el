@@ -28,14 +28,14 @@ rather than `nil'."
   (voicemacs--maphash
    (lambda (mode objects)
      (cons
-       ;; Global objects are stored under the `nil' key, but we can't
-       ;; encode a `nil' key into JSON. Replace it with `global'.
-       (or mode 'global)
-       ;; Simplify the objects, remove redundant information
-       (voicemacs--maphash (lambda (name type)
-                             ;; Just transfer the info we need
-                             (voicemacs--it-filter-type type voicemacs-it-type-keys))
-                           objects)))
+      ;; Global objects are stored under the `nil' key, but we can't
+      ;; encode a `nil' key into JSON. Replace it with `global'.
+      (or mode 'global)
+      ;; Simplify the objects, remove redundant information
+      (voicemacs--maphash (lambda (name type)
+                            ;; Just transfer the info we need
+                            (voicemacs--it-filter-type type voicemacs-it-type-keys))
+                          objects)))
    it-object-types))
 
 
