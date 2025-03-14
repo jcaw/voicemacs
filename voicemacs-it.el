@@ -1,3 +1,7 @@
+(require 'voicemacs-base)
+(require 'voicemacs-command)
+
+
 (defvar voicemacs-it-type-keys
   '(name
     modes
