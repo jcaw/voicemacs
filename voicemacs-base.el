@@ -381,7 +381,7 @@ This is only used with `TODO: when key accumulation active'.")
 This tracks digit keypresses and creates commands to handle the
 overall number entered, which are bound in `keymap'. Each
 keypress, `move-function' is called on the raw number."
-  (assert (symbolp move-function))
+  (cl-assert (symbolp move-function))
   (dotimes (n 10)  ; 0-9
     (eval
      `(let* ((n-str (format "%s" ,n))

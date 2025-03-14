@@ -145,7 +145,7 @@ Incompatible with `helm-display-line-numbers-mode'."
 
 Allows helm-swoop to be invoked via RPC without blocking."
   ;; Type check because it's delayed.
-  (assert (stringp query))
+  (cl-assert (stringp query))
   (run-with-timer 0 nil 'helm-swoop :query query))
 
 (voicemacs-expose-function 'voicemacs-helm-swoop)
