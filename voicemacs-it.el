@@ -55,4 +55,4 @@ rather than `nil'."
 
 
 (provide 'voicemacs-it)
-;; voicemacs-it.el ends here
+;;; voicemacs-it.el ends here
